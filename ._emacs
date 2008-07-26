@@ -8,17 +8,36 @@
 (defun add-path (p)
   (add-to-list 'load-path (concat custom-basedir p)))
 
-
+;;; Font Settings
+(set-default-font "Consolas-7")
+    (set-fontset-font (frame-parameter nil 'font)
+      'han '("cwTeXHei" . "unicode-bmp"))
 
 ;;; Theme Settings
 (message "applying theme settings ...")
 (require 'color-theme)
 (setq color-theme-is-global t)
-(color-theme-initialize)
+(cond ((not (eq system-type 'gnu-linux))
+       (color-theme-initialize)))
 (color-theme-comidia)
 
 ;;; Hide the toolbar
 (tool-bar-mode -1)
+
+;;; Fullscreen
+(cond ((eq system-type 'gnu/linux)
+   (defun fullscreen ()
+      (interactive)
+      (set-frame-parameter nil 'fullscreen
+                           (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
+
+    (global-set-key [f11] 'fullscreen)
+
+    (defun switch-full-screen ()
+      (interactive)
+      (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen"))
+
+    (global-set-key [f11] 'switch-full-screen)))
 
 (message "loading yasnippet customizations ...")
 (add-path "yasnippet")
@@ -106,7 +125,8 @@
 (add-hook 'find-file-hook 'xcode-choose-header-mode)
 
 ;;; Xcode Build Settings
-(defun xcode-compile ()
+(cond ((not (eq system-type 'gnu/linux))
+ (defun xcode-compile ()
   (interactive)
   (let ((df (directory-files "."))
         (has-proj-file nil))
@@ -131,7 +151,7 @@
 
 (interactive)
   (shell-command "osascript -e 'tell application \"Xcode\" to build project 1'")
-  (shell-command "osascript -e 'tell application \"Xcode\" to launch project 1'"))
+  (shell-command "osascript -e 'tell application \"Xcode\" to launch project 1'"))))
 
 ;;; Scheme Settings
 (message "applying scheme settings ...")
