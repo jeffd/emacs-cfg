@@ -9,44 +9,52 @@
   (add-to-list 'load-path (concat custom-basedir p)))
 
 ;;; Font Settings
-(set-default-font "Consolas-7")
-    (set-fontset-font (frame-parameter nil 'font)
-      'han '("cwTeXHei" . "unicode-bmp"))
+(set-default-font "Consolas-13")
+;(set-fontset-font (frame-parameter nil 'font)
+;                  'han '("cwTeXHei" . "unicode-bmp"))
 
-;;; Theme Settings
+;;; Settings Theme
 (message "applying theme settings ...")
 (require 'color-theme)
 (setq color-theme-is-global t)
-(cond ((not (eq system-type 'gnu-linux))
+(cond ((not (eq system-type 'gnu/linux))
        (color-theme-initialize)))
 (color-theme-comidia)
 
-;;; Hide the toolbar
-(tool-bar-mode -1)
+;;; Hide the toolbar and friends
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+;;;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 
 ;;; Fullscreen
 (cond ((eq system-type 'gnu/linux)
-   (defun fullscreen ()
-      (interactive)
-      (set-frame-parameter nil 'fullscreen
-                           (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
+       (defun fullscreen ()
+         (interactive)
+         (set-frame-parameter nil 'fullscreen
+                              (if (frame-parameter nil 'fullscreen) nil 'fullboth)))
 
-    (global-set-key [f11] 'fullscreen)
+       (global-set-key [f11] 'fullscreen)
 
-    (defun switch-full-screen ()
-      (interactive)
-      (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen"))
+       (defun switch-full-screen ()
+         (interactive)
+         (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen"))
 
-    (global-set-key [f11] 'switch-full-screen)))
+       (global-set-key [f11] 'switch-full-screen)))
 
 (message "loading yasnippet customizations ...")
 (add-path "yasnippet")
 (require 'yasnippet)
 
+(yas/initialize)
+(yas/load-directory "~/.emacs-cfg/.emacs.d/yasnippet/")
+
+(setq yas/extra-mode-hooks
+   '(ruby-mode-hook actionscript-mode-hook ox-mode-hook objc-mode-hook cc-mode-hook python-mode-hook))
+
 ;;; Git
 (message "applying git settings ...")
-;(require 'git)
-;(require 'gitsum)
+(require 'git)
+(require 'gitsum)
 
 ;;; Cursor and Line
 (message "applying cursor settings ...")
@@ -60,7 +68,7 @@
 ;;; C Style Settings
 (message "applying c style settings ...")
 (setq-default indent-tabs-mode nil)
-;(setq c-basic-offset 2)
+                                        ;(setq c-basic-offset 2)
 (setq tab-width 2)
 ;;;(add-hook 'c-mode-hook '(lambda ()(c-set-style "linux")))
 
@@ -113,7 +121,7 @@
   (if (string-equal (substring (buffer-file-name) -2) ".h")
       (progn
         ;; OK, we got a .h file, if a .m file exists we'll assume it's
-        ; an objective c file. Otherwise, we'll look for a .cpp file.
+                                        ; an objective c file. Otherwise, we'll look for a .cpp file.
         (let ((dot-m-file (concat (substring (buffer-file-name) 0 -1) "m"))
               (dot-cpp-file (concat (substring (buffer-file-name) 0 -1) "cpp")))
           (if (file-exists-p dot-m-file)
@@ -126,58 +134,56 @@
 
 ;;; Xcode Build Settings
 (cond ((not (eq system-type 'gnu/linux))
- (defun xcode-compile ()
-  (interactive)
-  (let ((df (directory-files "."))
-        (has-proj-file nil))
-    (while (and df (not has-proj-file))
-      (let ((fn (car df)))
-        (if (> (length fn) 10)
-            (if (string-equal (substring fn -10) ".xcodeproj")
-                (setq has-proj-file t))))
-      (setq df (cdr df)))
-    (if has-proj-file
-        (compile "xcodebuild -configuration Debug")
-      (compile "make"))))
+       (defun xcode-compile ()
+         (interactive)
+         (let ((df (directory-files "."))
+               (has-proj-file nil))
+           (while (and df (not has-proj-file))
+             (let ((fn (car df)))
+               (if (> (length fn) 10)
+                   (if (string-equal (substring fn -10) ".xcodeproj")
+                       (setq has-proj-file t))))
+             (setq df (cdr df)))
+           (if has-proj-file
+               (compile "xcodebuild -configuration Debug")
+             (compile "make"))))
 
-(defun build-with-xcode ()
-  (interactive)
-  (defun dir () (shell-command "osascript -e 'tell application \"Xcode\" to get the project directory of project 1'"))
-  (shell-command (format "cd %s" (dir))))
+       (defun build-with-xcode ()
+         (interactive)
+         (defun dir () (shell-command "osascript -e 'tell application \"Xcode\" to get the project directory of project 1'"))
+         (shell-command (format "cd %s" (dir))))
 
-(define-key osx-key-mode-map (kbd "A-r") 'build-and-go-in-xcode)
+       (define-key osx-key-mode-map (kbd "A-r") 'build-and-go-in-xcode)
 
-(defun build-and-go-in-xcode ()
+       (defun build-and-go-in-xcode ()
 
-(interactive)
-  (shell-command "osascript -e 'tell application \"Xcode\" to build project 1'")
-  (shell-command "osascript -e 'tell application \"Xcode\" to launch project 1'"))))
+         (interactive)
+         (shell-command "osascript -e 'tell application \"Xcode\" to build project 1'")
+         (shell-command "osascript -e 'tell application \"Xcode\" to launch project 1'"))))
 
 ;;; Scheme Settings
 (message "applying scheme settings ...")
 (autoload 'paredit-mode "paredit.el"
-    "Minor mode for pseudo-structurally editing Lisp code." t)
+  "Minor mode for pseudo-structurally editing Lisp code." t)
 
 (autoload 'scheme48-mode "scheme48.el" "Major mode for Scheme48 interaction." t)
 (autoload 'aling-let-keybinding "align-let" "Align let mode" t)
 
-;(add-to-list 'auto-mode-alist '("\\.scm\\'" . scheme48-mode))
+                                        ;(add-to-list 'auto-mode-alist '("\\.scm\\'" . scheme48-mode))
 (setq auto-mode-alist (cons '("\\.scm\\'" . scheme48-mode) auto-mode-alist))
 (require 'scheme48)
 
 (add-to-list 'interpreter-mode-alist '("scsh" . scheme48-mode))
 (setq scheme-program-name "nuscsh")
 
-(add-hook 'scheme-mode-hook
+(add-hook 'paredit-mode-hook
           (lambda ()
             (paredit-mode +1)
-            (align-let-keybinding)
+;            (align-let-keybinding)
             (define-key paredit-mode-map (kbd "[") 'paredit-open-round)
             (define-key paredit-mode-map (kbd "]") 'paredit-close-round)
             (define-key paredit-mode-map (kbd "(") 'paredit-open-square)
             (define-key paredit-mode-map (kbd ")") 'paredit-close-square)))
-
-
 
 
 ;;; OpenGL Mode
@@ -192,3 +198,20 @@
  		    (require 'OpenGL)
 		    (OpenGL-minor-mode 1)
 		    (OpenGL-setup-keys)))))
+
+;;; scheme-lookup
+(add-path "scheme-lookup")
+(autoload 'scheme-lookup "scheme-lookup"
+  "View the documentation on the Scheme symbol SYMBOL-NAME."
+  t)
+(eval-after-load 'scheme-lookup
+  '(mapc 'require '(scheme-lookup-r5rs scheme-lookup-srfi scheme-lookup-scheme48 scheme-lookup-scsh)))
+(put 'scheme-lookup
+     'mcomplete-mode
+     '(:method-set (mcomplete-substr-method mcomplete-prefix-method)
+		   :exhibit-start-chars 1))
+(eval-after-load 'scheme
+  '(progn (define-key scheme-mode-map  (kbd "C-c C-d h") 'scheme-lookup)))
+
+
+
