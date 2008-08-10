@@ -1,7 +1,7 @@
 ;;; Jeff Dlouhy's Emacs Settings
 (message "started loading settings ...")
 
-(setq custom-basedir (expand-file-name "~/.emacs-cfg/.emacs.d/"))
+(setq custom-basedir (expand-file-name "~/.emacs-cfg/emacs.d/"))
 (add-to-list 'load-path custom-basedir)
 (add-to-list 'load-path "/usr/local/bin")
 
@@ -46,7 +46,7 @@
 (require 'yasnippet)
 
 (yas/initialize)
-(yas/load-directory "~/.emacs-cfg/.emacs.d/yasnippet/")
+(yas/load-directory "~/.emacs-cfg/emacs.d/yasnippet/")
 
 (setq yas/extra-mode-hooks
    '(ruby-mode-hook actionscript-mode-hook ox-mode-hook objc-mode-hook cc-mode-hook python-mode-hook))
