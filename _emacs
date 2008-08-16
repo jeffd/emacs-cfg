@@ -17,8 +17,8 @@
 (message "applying theme settings ...")
 (require 'color-theme)
 (setq color-theme-is-global t)
-(cond ((not (eq system-type 'gnu/linux))
-       (color-theme-initialize)))
+;(cond ((not (eq system-type 'gnu/linux))
+       (color-theme-initialize);))
 (color-theme-comidia)
 
 ;;; Hide the toolbar and friends
@@ -213,5 +213,12 @@
 (eval-after-load 'scheme
   '(progn (define-key scheme-mode-map  (kbd "C-c C-d h") 'scheme-lookup)))
 
-
+;;; Python Settings
+(message "applying python settings ...")
+(cond ((eq system-type 'gnu/linux)
+       (autoload 'python-mode "python.el"
+         "Major mode for Python replacing old python-mode" t)
+       (require 'pymacs)
+       (pymacs-load "ropemacs" "rope-")
+))
 
