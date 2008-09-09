@@ -9,16 +9,19 @@
   (add-to-list 'load-path (concat custom-basedir p)))
 
 ;;; Font Settings
-(set-default-font "Consolas-13")
 ;(set-fontset-font (frame-parameter nil 'font)
 ;                  'han '("cwTeXHei" . "unicode-bmp"))
+(message "applying font settings ...")
+(if (eq system-type 'darwin)
+    (set-face-attribute 'default nil
+			:family "consolas" :height 130)
+  (set-default-font "Consolas-13"))
 
 ;;; Settings Theme
 (message "applying theme settings ...")
 (require 'color-theme)
 (setq color-theme-is-global t)
-;(cond ((not (eq system-type 'gnu/linux))
-       (color-theme-initialize);))
+(color-theme-initialize)
 (color-theme-comidia)
 
 ;;; Hide the toolbar and friends
@@ -41,6 +44,15 @@
 
        (global-set-key [f11] 'switch-full-screen)))
 
+(cond ((eq system-type 'darwin)
+       (defun toggle-fullscreen ()
+         (interactive)
+         (set-frame-parameter nil 'fullscreen (if (frame-parameter nil 'fullscreen)
+                                                  nil
+                                                'fullboth)))
+
+       (global-set-key [(meta return)] 'toggle-fullscreen)))
+
 (message "loading yasnippet customizations ...")
 (add-path "yasnippet")
 (require 'yasnippet)
@@ -60,6 +72,8 @@
 (message "applying cursor settings ...")
 (setq-default cursor-type 'box)
 (setq-default show-trailing-whitespace t)
+(setq-default transient-mark-mode t)
+(setq default-truncate-lines t)
 
 ;;; Scrolling
 (global-set-key [C-next] 'scroll-other-window)
@@ -67,15 +81,17 @@
 
 ;;; C Style Settings
 (message "applying c style settings ...")
+(require 'objc-c-mode)
 (setq-default indent-tabs-mode nil)
-                                        ;(setq c-basic-offset 2)
 (setq tab-width 2)
-;;;(add-hook 'c-mode-hook '(lambda ()(c-set-style "linux")))
 
 ;; Create my personal style.
 (defconst my-c-style
-  '((c-tab-always-indent        . t)
-    (c-comment-only-line-offset . 2)
+  '((indent-tabs-mode . nil)
+    (c-basic-offset . 2)
+    (tab-width . 2)
+    (c-indent-comments-syntactically-p       . t)
+    (c-comment-only-line-offset              . 0)
     (c-hanging-braces-alist     . ((substatement-open after)
                                    (brace-list-open)))
     (c-hanging-colons-alist     . ((member-init-intro before)
@@ -85,12 +101,19 @@
                                    (access-label after)))
     (c-cleanup-list             . (scope-operator
                                    empty-defun-braces
-                                   defun-close-semi))
+                                   defun-close-semi
+                                   brace-else-brace
+                                   brace-elseif-brace
+                                   compact-empty-funcall))
     (c-offsets-alist            . ((arglist-close . c-lineup-arglist)
                                    (substatement-open . -2)
                                    (case-label        . 2)
                                    (block-open        . 0)
-                                   (knr-argdecl-intro . -)))
+                                   (knr-argdecl-intro . -)
+                                   (objc-method-call-cont .
+                                                          (c-lineup-ObjC-method-call-colons
+                                                           c-lineup-ObjC-method-call
+                                                           +))))
     (c-echo-syntactic-information-p . t))
   "Jeff's C Programming Style")
 
@@ -106,8 +129,28 @@
         indent-tabs-mode nil)
   ;; we like auto-newline, but not hungry-delete
   (c-toggle-auto-newline 1)
-  (setq c-basic-offset 2))
+  (setq c-basic-offset tab-width))
+
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+
+;;; C Refactoring Functions
+;; move current function up
+(defun move-function-up ()
+  (interactive)
+  (save-excursion
+    (c-mark-function)
+    (kill-region (region-beginning) (region-end))
+    (c-beginning-of-defun 1)
+    (yank)))
+
+;; move current function down
+(defun move-function-down ()
+  (interactive)
+  (save-excursion
+    (c-mark-function)
+    (kill-region (region-beginning) (region-end))
+    (c-beginning-of-defun -1)
+    (yank)))
 
 (message "applying Xcode settings ...")
 ;;; Objective-C Settings
@@ -133,7 +176,7 @@
 (add-hook 'find-file-hook 'xcode-choose-header-mode)
 
 ;;; Xcode Build Settings
-(cond ((not (eq system-type 'gnu/linux))
+(cond ((eq system-type 'darwin)
        (defun xcode-compile ()
          (interactive)
          (let ((df (directory-files "."))
@@ -146,14 +189,28 @@
              (setq df (cdr df)))
            (if has-proj-file
                (compile "xcodebuild -configuration Debug")
-             (compile "make"))))
+             (cd "..")
+             (xcode-compile))))
+
+       (defun xcode-clean ()
+         (interactive)
+         (let ((df (directory-files "."))
+               (has-proj-file nil))
+           (while (and df (not has-proj-file))
+             (let ((fn (car df)))
+               (if (> (length fn) 10)
+                   (if (string-equal (substring fn -10) ".xcodeproj")
+                       (setq has-proj-file t))))
+             (setq df (cdr df)))
+           (if has-proj-file
+               (compile "xcodebuild -configuration Debug clean"))))
 
        (defun build-with-xcode ()
          (interactive)
          (defun dir () (shell-command "osascript -e 'tell application \"Xcode\" to get the project directory of project 1'"))
          (shell-command (format "cd %s" (dir))))
 
-       (define-key osx-key-mode-map (kbd "A-r") 'build-and-go-in-xcode)
+;       (define-key osx-key-mode-map (kbd "A-r") 'build-and-go-in-xcode)
 
        (defun build-and-go-in-xcode ()
 
@@ -168,9 +225,8 @@
 
 (autoload 'scheme48-mode "scheme48.el" "Major mode for Scheme48 interaction." t)
 (autoload 'aling-let-keybinding "align-let" "Align let mode" t)
-
-                                        ;(add-to-list 'auto-mode-alist '("\\.scm\\'" . scheme48-mode))
 (setq auto-mode-alist (cons '("\\.scm\\'" . scheme48-mode) auto-mode-alist))
+
 (require 'scheme48)
 
 (add-to-list 'interpreter-mode-alist '("scsh" . scheme48-mode))
@@ -219,6 +275,14 @@
        (autoload 'python-mode "python.el"
          "Major mode for Python replacing old python-mode" t)
        (require 'pymacs)
-       (pymacs-load "ropemacs" "rope-")
-))
+       (pymacs-load "ropemacs" "rope-")))
 
+;;; Artist Mode
+(autoload 'artist-mode "artist" "Enter artist-mode" t)
+(require 'artist)
+
+;;; Gnu Server Settings
+(message "applying gnuserv settings ...")
+(autoload 'gnuserv-start "gnuserv-compat"
+          "Allow this Emacs process to be a server for client processes." t)
+(gnuserv-start)
