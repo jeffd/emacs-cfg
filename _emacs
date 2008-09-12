@@ -133,6 +133,8 @@
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
+(setq next-line-add-newlines nil)
+
 ;;; C Refactoring Functions
 ;; move current function up
 (defun move-function-up ()
@@ -156,6 +158,7 @@
 ;;; Objective-C Settings
 (setq auto-mode-alist (cons '("\\.mm\\'" . objc-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.m\\'" . objc-mode) auto-mode-alist))
+(setq auto-mode-alist (cons '("\\.j\\'" . objc-mode) auto-mode-alist))
 
 ;;; Header File Support
 ;;; http://hutley.net/brett/emacs/integrating-emacs-and-xcode/
