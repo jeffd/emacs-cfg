@@ -241,6 +241,8 @@
             (define-key paredit-mode-map (kbd "(") 'paredit-open-square)
             (define-key paredit-mode-map (kbd ")") 'paredit-close-square)))
 
+;;; PLT Scheme
+(require 'quack)
 
 ;;; OpenGL Mode
 (message "applying OpenGL settings ...")
