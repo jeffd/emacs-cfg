@@ -3,6 +3,7 @@
 
 (setq custom-basedir (expand-file-name "~/.emacs-cfg/emacs.d/"))
 (add-to-list 'load-path custom-basedir)
+(add-to-list 'load-path "/usr/local/plt/bin")
 (add-to-list 'load-path "/usr/local/bin")
 
 (defun add-path (p)
@@ -74,6 +75,7 @@
 (setq-default show-trailing-whitespace t)
 (setq-default transient-mark-mode t)
 (setq default-truncate-lines t)
+(cua-mode t)
 
 ;;; Scrolling
 (global-set-key [C-next] 'scroll-other-window)
@@ -245,7 +247,7 @@
             (define-key paredit-mode-map (kbd ")") 'paredit-close-square)))
 
 ;;; PLT Scheme
-(require 'quack)
+;;;(require 'quack)
 
 ;;; OpenGL Mode
 (message "applying OpenGL settings ...")
@@ -291,3 +293,18 @@
 (autoload 'gnuserv-start "gnuserv-compat"
           "Allow this Emacs process to be a server for client processes." t)
 (gnuserv-start)
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(quack-default-program "/usr/local/plt/bin/mzscheme")
+ '(quack-fontify-style nil)
+ '(quack-programs (quote ("/usr/local/plt/bin/mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M
+    errortrace" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))))
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ )
