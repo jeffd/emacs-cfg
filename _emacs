@@ -25,6 +25,15 @@
 (color-theme-initialize)
 (color-theme-comidia)
 
+;;; Shell Settings
+(message "applying shell settings ...")
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(add-hook 'comint-output-filter-functions
+          'comint-strip-ctrl-m)
+
+;;; Compile Settings
+(require 'smart-compile)
+
 ;;; Hide the toolbar and friends
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
@@ -75,7 +84,7 @@
 (setq-default show-trailing-whitespace t)
 (setq-default transient-mark-mode t)
 (setq default-truncate-lines t)
-(cua-mode t)
+;(cua-mode t)
 
 ;;; Scrolling
 (global-set-key [C-next] 'scroll-other-window)
@@ -236,6 +245,7 @@
 
 (add-to-list 'interpreter-mode-alist '("scsh" . scheme48-mode))
 (setq scheme-program-name "nuscsh")
+(setq-default show-paren-mode t)
 
 (add-hook 'paredit-mode-hook
           (lambda ()
@@ -247,7 +257,7 @@
             (define-key paredit-mode-map (kbd ")") 'paredit-close-square)))
 
 ;;; PLT Scheme
-;;;(require 'quack)
+;(require 'quack)
 
 ;;; OpenGL Mode
 (message "applying OpenGL settings ...")
@@ -288,11 +298,25 @@
 (autoload 'artist-mode "artist" "Enter artist-mode" t)
 (require 'artist)
 
+;;; Java Settings
+;; (message "applying java settings ...")
+;; (add-path "java/jde/lisp")
+;; (add-path "java/elib")
+;; (load-file "emacs.d/java/cedet/common/cedet.el")
+;; (require 'jde)
+
+(put 'narrow-to-region 'disabled nil)
+
 ;;; Gnu Server Settings
 (message "applying gnuserv settings ...")
-(autoload 'gnuserv-start "gnuserv-compat"
-          "Allow this Emacs process to be a server for client processes." t)
-(gnuserv-start)
+(cond ((eq system-type 'darwin)
+       (autoload 'gnuserv-start "gnuserv-compat"
+         "Allow this Emacs process to be a server for client processes." t)
+       (gnuserv-start))
+      ((eq system-type 'gnu/linux)
+       (server-start)))
+
+
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
