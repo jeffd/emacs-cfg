@@ -31,6 +31,11 @@
 (add-hook 'comint-output-filter-functions
           'comint-strip-ctrl-m)
 
+;;; Smooth Scrolling
+(message "applying scrolling settings ...")
+(setq scroll-step 1
+         scroll-conservatively 10000)
+
 ;;; Compile Settings
 (require 'smart-compile)
 
@@ -139,7 +144,7 @@
         ;; this will make sure spaces are used instead of tabs
         indent-tabs-mode nil)
   ;; we like auto-newline, but not hungry-delete
-  (c-toggle-auto-newline 1)
+;  (c-toggle-auto-newline 1)
   (setq c-basic-offset tab-width))
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
@@ -247,14 +252,21 @@
 (setq scheme-program-name "nuscsh")
 (setq-default show-paren-mode t)
 
-(add-hook 'paredit-mode-hook
-          (lambda ()
-            (paredit-mode +1)
-;            (align-let-keybinding)
-            (define-key paredit-mode-map (kbd "[") 'paredit-open-round)
-            (define-key paredit-mode-map (kbd "]") 'paredit-close-round)
-            (define-key paredit-mode-map (kbd "(") 'paredit-open-square)
-            (define-key paredit-mode-map (kbd ")") 'paredit-close-square)))
+(autoload 'align-let "align-let" nil t)
+(autoload 'align-let-keybinding "align-let" nil t)
+(add-hook 'scheme-mode-hook     'align-let-keybinding)
+
+(add-hook 'paredit-mode-hook (lambda () (paredit-mode +1)))
+
+  (eval-after-load 'paredit
+    '(progn (define-key paredit-mode-map (kbd "[") 'paredit-open-round)
+    (define-key paredit-mode-map (kbd "]") 'paredit-close-round)
+    (define-key paredit-mode-map (kbd "(") 'paredit-open-square)
+    (define-key paredit-mode-map (kbd ")") 'paredit-close-square)))
+
+
+
+(require 'srfi)
 
 ;;; PLT Scheme
 ;(require 'quack)
@@ -324,7 +336,7 @@
   ;; If there is more than one, they won't work right.
  '(quack-default-program "/usr/local/plt/bin/mzscheme")
  '(quack-fontify-style nil)
- '(quack-programs (quote ("/usr/local/plt/bin/mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M
+ '(quack-programs (quote ("nuscsh" "/usr/local/plt/bin/mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M
     errortrace" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))))
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
