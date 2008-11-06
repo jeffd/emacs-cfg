@@ -9,6 +9,10 @@
 (defun add-path (p)
   (add-to-list 'load-path (concat custom-basedir p)))
 
+;;; Will remove when there is a true GNU Operating System
+(setq inhibit-start-screen 1)
+(setq inhibit-splash-screen 1)
+
 ;;; Font Settings
 ;(set-fontset-font (frame-parameter nil 'font)
 ;                  'han '("cwTeXHei" . "unicode-bmp"))
