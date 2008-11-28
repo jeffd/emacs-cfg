@@ -277,7 +277,7 @@
 
 (add-to-list 'interpreter-mode-alist '("scsh" . scheme48-mode))
 (setq scheme-program-name "nuscsh")
-(setq-default show-paren-mode t)
+(show-paren-mode 1)
 
 (autoload 'align-let "align-let" nil t)
 (autoload 'align-let-keybinding "align-let" nil t)
