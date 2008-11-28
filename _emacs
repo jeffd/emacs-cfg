@@ -72,6 +72,7 @@
 
        (global-set-key [(meta return)] 'toggle-fullscreen)))
 
+;;; Snippet settings
 (message "loading yasnippet customizations ...")
 (add-path "yasnippet")
 (require 'yasnippet)
@@ -173,6 +174,28 @@
     (kill-region (region-beginning) (region-end))
     (c-beginning-of-defun -1)
     (yank)))
+
+;;; AucTeX settings
+(load "auctex.el" nil t t)
+(load "preview-latex.el" nil t t)
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
+
+;;; Ejacs
+(add-path "js")
+(autoload 'js-console "js-console" nil t)
+(require 'json)
+
+(autoload 'js2-mode "js2" nil t)
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+
+(add-path "muse")
+(require 'muse-mode)
+(require 'muse-publish)
+(require 'muse-html)
+(require 'muse-latex)
+(require 'muse-xml)
 
 (message "applying Xcode settings ...")
 ;;; Objective-C Settings
