@@ -42,6 +42,9 @@
 
 ;;; Compile Settings
 (require 'smart-compile)
+;;; C-x b
+(require 'iswitchb)
+(iswitchb-mode 1)
 
 ;;; Hide the toolbar and friends
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
