@@ -349,6 +349,24 @@
 
 (put 'narrow-to-region 'disabled nil)
 
+;;; w3m
+(message "applying browser settings ...")
+(if (and (= emacs-major-version 23)
+         (eq system-type 'gnu/linux))
+    (progn
+      (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
+      (require 'w3m-load))
+  (require 'w3m))
+
+(setq browse-url-browser-function 'w3m-browse-url)
+ (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
+ ;; optional keyboard short-cut
+ (global-set-key "\C-xm" 'browse-url-at-point)
+
+(require 'w3m-search)
+(add-to-list 'w3m-search-engine-alist
+             '("emacs-wiki" "http://www.emacswiki.org/cgi-bin/wiki.pl?search=%s"))
+
 ;;; Gnu Server Settings
 (message "applying gnuserv settings ...")
 (cond ((eq system-type 'darwin)
