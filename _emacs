@@ -14,13 +14,14 @@
 (setq inhibit-splash-screen 1)
 
 ;;; Font Settings
-;(set-fontset-font (frame-parameter nil 'font)
-;                  'han '("cwTeXHei" . "unicode-bmp"))
+;;;(set-fontset-font (frame-parameter nil 'font)
+;;;                  'han '("cwTeXHei" . "unicode-bmp"))
+
 (message "applying font settings ...")
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
 			:family "consolas" :height 130)
-  (set-default-font "Consolas-13"))
+  (set-frame-font "Consolas-13"))
 
 ;;; Settings Theme
 (message "applying theme settings ...")
@@ -38,13 +39,17 @@
 ;;; Smooth Scrolling
 (message "applying scrolling settings ...")
 (setq scroll-step 1
-         scroll-conservatively 10000)
+      scroll-conservatively 10000)
 
 ;;; Compile Settings
 (require 'smart-compile)
+
 ;;; C-x b
 (require 'iswitchb)
 (iswitchb-mode 1)
+
+;;; Narrowing
+(put 'narrow-to-region 'disabled nil)
 
 ;;; Hide the toolbar and friends
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
@@ -84,7 +89,7 @@
 (yas/load-directory "~/.emacs-cfg/emacs.d/yasnippet/")
 
 (setq yas/extra-mode-hooks
-   '(ruby-mode-hook actionscript-mode-hook ox-mode-hook objc-mode-hook cc-mode-hook python-mode-hook))
+      '(ruby-mode-hook actionscript-mode-hook ox-mode-hook objc-mode-hook cc-mode-hook python-mode-hook))
 
 ;;; Git
 (message "applying git settings ...")
@@ -97,7 +102,7 @@
 (setq-default show-trailing-whitespace t)
 (setq-default transient-mark-mode t)
 (setq default-truncate-lines t)
-;(cua-mode t)
+;;;(cua-mode t)
 
 ;;; Scrolling
 (global-set-key [C-next] 'scroll-other-window)
@@ -109,10 +114,11 @@
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
 
-;; Create my personal style.
+;;; Create my personal style.
 (defconst my-c-style
   '((indent-tabs-mode . nil)
     (c-basic-offset . 2)
+    (c-subword-mode 1)
     (tab-width . 2)
     (c-indent-comments-syntactically-p       . t)
     (c-comment-only-line-offset              . 0)
@@ -141,9 +147,10 @@
     (c-echo-syntactic-information-p . t))
   "Jeff's C Programming Style")
 
+
 (c-add-style "jeff-style" my-c-style)
 
-;; Customizations for all modes in CC Mode.
+;;; Customizations for all modes in CC Mode.
 (defun my-c-mode-common-hook ()
   ;; set my personal style for the current buffer
   (c-set-style "jeff-style")
@@ -152,7 +159,7 @@
         ;; this will make sure spaces are used instead of tabs
         indent-tabs-mode nil)
   ;; we like auto-newline, but not hungry-delete
-;  (c-toggle-auto-newline 1)
+  ;;  (c-toggle-auto-newline 1)
   (setq c-basic-offset tab-width))
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
@@ -160,7 +167,7 @@
 (setq next-line-add-newlines nil)
 
 ;;; C Refactoring Functions
-;; move current function up
+;;; move current function up
 (defun move-function-up ()
   (interactive)
   (save-excursion
@@ -169,7 +176,7 @@
     (c-beginning-of-defun 1)
     (yank)))
 
-;; move current function down
+;;; move current function down
 (defun move-function-down ()
   (interactive)
   (save-excursion
@@ -179,19 +186,27 @@
     (yank)))
 
 ;;; AucTeX settings
-(load "auctex.el" nil t t)
-(load "preview-latex.el" nil t t)
-(setq TeX-auto-save t)
-(setq TeX-parse-self t)
-(setq-default TeX-master nil)
+;;; (load "auctex.el" nil t t)
+;;; (load "preview-latex.el" nil t t)
+;;; (setq TeX-auto-save t)
+;;; (setq TeX-parse-self t)
+;;; (setq-default TeX-master nil)
 
 ;;; Ejacs
-(add-path "js")
-(autoload 'js-console "js-console" nil t)
-(require 'json)
+;;;(add-path "js")
+;;;(autoload 'js-console "js-console" nil t)
+;;;(require 'json)
 
-(autoload 'js2-mode "js2" nil t)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+;;; JS Interpreter
+(require 'js-comint)
+(setq inferior-js-program-command "/usr/local/bin/objj")
+(add-hook 'js2-mode-hook '(lambda ()
+			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
+			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
+			    (local-set-key "\C-cb" 'js-send-buffer)
+			    (local-set-key "\C-c\C-b" 'js-send-buffer-and-go)
+			    (local-set-key "\C-cl" 'js-load-file-and-go)))
+
 
 (add-path "muse")
 (require 'muse-mode)
@@ -200,11 +215,13 @@
 (require 'muse-latex)
 (require 'muse-xml)
 
-(message "applying Xcode settings ...")
 ;;; Objective-C Settings
-(setq auto-mode-alist (cons '("\\.mm\\'" . objc-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.m\\'" . objc-mode) auto-mode-alist))
-(setq auto-mode-alist (cons '("\\.j\\'" . objc-mode) auto-mode-alist))
+(message "applying Xcode settings ...")
+(setq auto-mode-alist
+      (append '(("\\.mm\\'" . objc-mode)
+                ("\\.m\\'" . objc-mode)
+                ("\\.j\\'" . objc-mode))
+              auto-mode-alist))
 
 ;;; Header File Support
 ;;; http://hutley.net/brett/emacs/integrating-emacs-and-xcode/
@@ -259,7 +276,7 @@
          (defun dir () (shell-command "osascript -e 'tell application \"Xcode\" to get the project directory of project 1'"))
          (shell-command (format "cd %s" (dir))))
 
-;       (define-key osx-key-mode-map (kbd "A-r") 'build-and-go-in-xcode)
+                                        ;       (define-key osx-key-mode-map (kbd "A-r") 'build-and-go-in-xcode)
 
        (defun build-and-go-in-xcode ()
 
@@ -269,37 +286,64 @@
 
 ;;; Scheme Settings
 (message "applying scheme settings ...")
+(autoload 'scheme48-mode "scheme48.el" "Major mode for Scheme48 interaction." t)
+
+(setq auto-mode-alist
+      (append '(("\\.scm$" . scheme48-mode)
+                ("\\.ss$"  . scheme-mode) ; PLT & Chez
+                ("\\.sch$" . scheme-mode) ; Bigloo & Larceny
+                ("\\.sc$"  . scheme-mode) ; JMS
+                ("\\.asd$" . lisp-mode))  ; ASDF system files
+              auto-mode-alist))
+
+(add-hook 'scheme-mode-hook
+          (lambda ()
+            ;; Prevent font-lock from being confused about #| ... |#
+            ;; comments.
+            (set (make-local-variable 'comment-start-skip)
+                 (rx (and
+                      ;; If any backslashes are prefixed, ensure that
+                      ;; there be an even number of them.
+                      (submatch (or line-start (not (any ?\\)))
+                                (* "\\\\"))
+                      (or (+ ";") "#|")
+                      (* (any " \t")))))))
+
+(require 'scheme48)
+(add-to-list 'interpreter-mode-alist '("scsh" . scheme48-mode))
+(setq scheme-program-name "nuscsh")
+(if window-system (show-paren-mode +1))
+
+;;; LET (it be)
+(message "applying LET settings ...")
+(autoload 'align-let "align-let" nil t)
+(autoload 'align-let-keybinding "align-let" nil t)
+(add-hook 'emacs-lisp-mode-hook 'align-let-keybinding)
+(add-hook 'scheme-mode-hook     'align-let-keybinding)
+
+;;; Paredit
+(message "applying paredit settings ...")
 (autoload 'paredit-mode "paredit.el"
   "Minor mode for pseudo-structurally editing Lisp code." t)
 
-(autoload 'scheme48-mode "scheme48.el" "Major mode for Scheme48 interaction." t)
-(autoload 'aling-let-keybinding "align-let" "Align let mode" t)
-(setq auto-mode-alist (cons '("\\.scm\\'" . scheme48-mode) auto-mode-alist))
+(mapc (lambda (hook) (add-hook hook (lambda ()
+                                      (paredit-mode +1))))
+      '(lisp-mode-hook
+        emacs-lisp-mode-hook
+        scheme-mode-hook))
 
-(require 'scheme48)
+(eval-after-load "paredit"
+  '(progn
+     (define-key paredit-mode-map (kbd "[") 'paredit-open-round)
+     (define-key paredit-mode-map (kbd "]") 'paredit-close-round)
+     (define-key paredit-mode-map (kbd "(") 'paredit-open-square)
+     (define-key paredit-mode-map (kbd ")") 'paredit-close-square)))
 
-(add-to-list 'interpreter-mode-alist '("scsh" . scheme48-mode))
-(setq scheme-program-name "nuscsh")
-(show-paren-mode 1)
-
-(autoload 'align-let "align-let" nil t)
-(autoload 'align-let-keybinding "align-let" nil t)
-(add-hook 'scheme-mode-hook     'align-let-keybinding)
-
-(add-hook 'paredit-mode-hook (lambda () (paredit-mode +1)))
-
-  (eval-after-load 'paredit
-    '(progn (define-key paredit-mode-map (kbd "[") 'paredit-open-round)
-    (define-key paredit-mode-map (kbd "]") 'paredit-close-round)
-    (define-key paredit-mode-map (kbd "(") 'paredit-open-square)
-    (define-key paredit-mode-map (kbd ")") 'paredit-close-square)))
-
-
-
+;;; SRFI Browser
 (require 'srfi)
 
 ;;; PLT Scheme
-;(require 'quack)
+;;;(require 'quack)
 
 ;;; OpenGL Mode
 (message "applying OpenGL settings ...")
@@ -313,20 +357,6 @@
  		    (require 'OpenGL)
 		    (OpenGL-minor-mode 1)
 		    (OpenGL-setup-keys)))))
-
-;;; scheme-lookup
-(add-path "scheme-lookup")
-(autoload 'scheme-lookup "scheme-lookup"
-  "View the documentation on the Scheme symbol SYMBOL-NAME."
-  t)
-(eval-after-load 'scheme-lookup
-  '(mapc 'require '(scheme-lookup-r5rs scheme-lookup-srfi scheme-lookup-scheme48 scheme-lookup-scsh)))
-(put 'scheme-lookup
-     'mcomplete-mode
-     '(:method-set (mcomplete-substr-method mcomplete-prefix-method)
-		   :exhibit-start-chars 1))
-(eval-after-load 'scheme
-  '(progn (define-key scheme-mode-map  (kbd "C-c C-d h") 'scheme-lookup)))
 
 ;;; Python Settings
 (message "applying python settings ...")
@@ -347,25 +377,24 @@
 ;; (load-file "emacs.d/java/cedet/common/cedet.el")
 ;; (require 'jde)
 
-(put 'narrow-to-region 'disabled nil)
 
 ;;; w3m
-(message "applying browser settings ...")
-(if (and (= emacs-major-version 23)
-         (eq system-type 'gnu/linux))
-    (progn
-      (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
-      (require 'w3m-load))
-  (require 'w3m))
+;; (message "applying browser settings ...")
+;; (if (and (= emacs-major-version 23)
+;;          (eq system-type 'gnu/linux))
+;;     (progn
+;;       (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
+;;       (require 'w3m-load))
+;;   (require 'w3m))
 
-(setq browse-url-browser-function 'w3m-browse-url)
- (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
- ;; optional keyboard short-cut
- (global-set-key "\C-xm" 'browse-url-at-point)
+;; (setq browse-url-browser-function 'w3m-browse-url)
+;;  (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
+;;  ;; optional keyboard short-cut
+;;  (global-set-key "\C-xm" 'browse-url-at-point)
 
-(require 'w3m-search)
-(add-to-list 'w3m-search-engine-alist
-             '("emacs-wiki" "http://www.emacswiki.org/cgi-bin/wiki.pl?search=%s"))
+;; (require 'w3m-search)
+;; (add-to-list 'w3m-search-engine-alist
+;;              '("emacs-wiki" "http://www.emacswiki.org/cgi-bin/wiki.pl?search=%s"))
 
 ;;; Gnu Server Settings
 (message "applying gnuserv settings ...")
@@ -376,19 +405,9 @@
       ((eq system-type 'gnu/linux)
        (server-start)))
 
-
-(custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(quack-default-program "/usr/local/plt/bin/mzscheme")
- '(quack-fontify-style nil)
- '(quack-programs (quote ("nuscsh" "/usr/local/plt/bin/mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "mred -z" "mzscheme" "mzscheme -M
-    errortrace" "mzscheme3m" "mzschemecgc" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))))
-(custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- )
+;;; Emacs Lisp Package Archive
+(message "applying ELPA settings ...")
+(setq package-user-dir "~/.emacs-cfg/emacs.d/elpa")
+(add-path "elpa")
+(load "package")
+(package-initialize)
