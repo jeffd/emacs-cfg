@@ -9,6 +9,13 @@
 (defun add-path (p)
   (add-to-list 'load-path (concat custom-basedir p)))
 
+;;; Emacs Lisp Package Archive
+(message "applying ELPA settings ...")
+(setq package-user-dir "~/.emacs-cfg/emacs.d/elpa")
+(add-path "elpa")
+(load "package")
+(package-initialize)
+
 ;;; Will remove when there is a true GNU Operating System
 (setq inhibit-start-screen 1)
 (setq inhibit-splash-screen 1)
@@ -198,14 +205,14 @@
 ;;;(require 'json)
 
 ;;; JS Interpreter
-(require 'js-comint)
-(setq inferior-js-program-command "/usr/local/bin/objj")
-(add-hook 'js2-mode-hook '(lambda ()
-			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
-			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
-			    (local-set-key "\C-cb" 'js-send-buffer)
-			    (local-set-key "\C-c\C-b" 'js-send-buffer-and-go)
-			    (local-set-key "\C-cl" 'js-load-file-and-go)))
+;(require 'js-comint)
+;(setq inferior-js-program-command "/usr/local/bin/objj")
+;; (add-hook 'js2-mode-hook '(lambda ()
+;; 			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
+;; 			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
+;; 			    (local-set-key "\C-cb" 'js-send-buffer)
+;; 			    (local-set-key "\C-c\C-b" 'js-send-buffer-and-go)
+;; 			    (local-set-key "\C-cl" 'js-load-file-and-go)))
 
 
 (add-path "muse")
@@ -345,6 +352,65 @@
 ;;; PLT Scheme
 ;;;(require 'quack)
 
+;;; Slime
+(message "applying SLIME settings ...")
+(add-path "slime")
+(require 'slime)
+(slime-setup)
+
+;;; Slime48
+(add-path "slime48")
+(eval-after-load "slime"
+  '(progn
+     (slime-setup)
+     (setq slime-lisp-implementations
+           `((s48 ("scheme48") :init slime48-init-command)
+             ,@slime-lisp-implementations))))
+
+(autoload 'slime48-init-command "slime48"
+  "Return a string to initialize Scheme48 running under SLIME.")
+
+;; This snippet lets you specify a scheme48-package local variable,
+;; in a file's -*- line or local variables section, and have SLIME48
+;; automatically evaluate code in the right package.  For instance,
+;; all of my Scheme48 source files start with:
+;;   ;;; -*- Mode: Scheme; scheme48-package: ... -*-
+(eval-after-load "slime48"
+  '(add-hook 'slime-mode-hook
+             (lambda ()
+               (if (and (boundp 'scheme48-package)
+                        scheme48-package)
+                   (setq slime-buffer-package
+                         (with-output-to-string
+                           (princ scheme48-package)))))))
+
+;;; Clojure
+(message "applying Clojure settings ...")
+(eval-after-load "clojure-mode"
+  '(progn
+     (defun clojure-paredit-hook () (paredit-mode +1))
+     (add-hook 'clojure-mode-hook 'clojure-paredit-hook)
+
+     (define-key clojure-mode-map "{" 'paredit-open-brace)
+     (define-key clojure-mode-map "}" 'paredit-close-brace)))
+
+;;; Clojure swank
+;;(setq swank-clojure-jar-path "~/Development/Clojure/clojure_1.0.0/clojure.jar")
+
+;;; Clojure classpaths
+;;;(setq swank-clojure-extra-classpaths (list "/path/to/extra/classpaths"))
+
+(add-path "swank-clojure")
+(require 'swank-clojure-autoload)
+
+;;; The following function runs Slime with Clojure, even if Slime defaults to another Lisp.
+;;; The above configuration alone, however, will make Clojure the default, so all that is necessary
+;;; to run Slime with Clojure is M-x slime.
+(defun run-clojure ()
+  "Starts clojure in Slime"
+  (interactive)
+  (slime 'clojure))
+
 ;;; OpenGL Mode
 (message "applying OpenGL settings ...")
 (autoload 'OpenGL-minor-mode "OpenGL.el" "OpenGL editing utilities." t)
@@ -405,9 +471,3 @@
       ((eq system-type 'gnu/linux)
        (server-start)))
 
-;;; Emacs Lisp Package Archive
-(message "applying ELPA settings ...")
-(setq package-user-dir "~/.emacs-cfg/emacs.d/elpa")
-(add-path "elpa")
-(load "package")
-(package-initialize)
