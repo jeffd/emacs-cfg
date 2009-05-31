@@ -432,6 +432,8 @@
        (require 'pymacs)
        (pymacs-load "ropemacs" "rope-")))
 
+(require 'django-html-mode)
+
 ;;; Artist Mode
 (autoload 'artist-mode "artist" "Enter artist-mode" t)
 (require 'artist)
