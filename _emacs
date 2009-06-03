@@ -20,6 +20,9 @@
 (setq inhibit-start-screen 1)
 (setq inhibit-splash-screen 1)
 
+;;; I condem thee to Hell!
+(global-set-key (kbd "C-x C-c") nil)
+
 ;;; Font Settings
 ;;;(set-fontset-font (frame-parameter nil 'font)
 ;;;                  'han '("cwTeXHei" . "unicode-bmp"))
