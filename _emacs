@@ -5,6 +5,7 @@
 (add-to-list 'load-path custom-basedir)
 (add-to-list 'load-path "/usr/local/plt/bin")
 (add-to-list 'load-path "/usr/local/bin")
+(add-to-list 'load-path "/usr/local/git/bin/")
 
 (defun add-path (p)
   (add-to-list 'load-path (concat custom-basedir p)))
@@ -22,6 +23,9 @@
 
 ;;; I condem thee to Hell!
 (global-set-key (kbd "C-x C-c") nil)
+
+(setq mac-command-key-is-meta t)
+(setq mac-command-modifier 'meta)
 
 ;;; Font Settings
 ;;;(set-fontset-font (frame-parameter nil 'font)
