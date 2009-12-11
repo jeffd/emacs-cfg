@@ -234,8 +234,11 @@
 (setq auto-mode-alist
       (append '(("\\.mm\\'" . objc-mode)
                 ("\\.m\\'" . objc-mode)
-                ("\\.j\\'" . objc-mode))
+                ("\\.j\\'" . objj-mode))
               auto-mode-alist))
+
+(require 'objc-c-mode)
+(require 'objj-mode)
 
 ;;; Header File Support
 ;;; http://hutley.net/brett/emacs/integrating-emacs-and-xcode/
