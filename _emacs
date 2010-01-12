@@ -410,16 +410,22 @@
 ;;; Clojure classpaths
 ;;;(setq swank-clojure-extra-classpaths (list "/path/to/extra/classpaths"))
 
-(add-path "swank-clojure")
-(require 'swank-clojure-autoload)
+;; (add-path "swank-clojure")
+;; (require 'swank-clojure-autoload)
 
 ;;; The following function runs Slime with Clojure, even if Slime defaults to another Lisp.
 ;;; The above configuration alone, however, will make Clojure the default, so all that is necessary
 ;;; to run Slime with Clojure is M-x slime.
-(defun run-clojure ()
-  "Starts clojure in Slime"
-  (interactive)
-  (slime 'clojure))
+;; (defun run-clojure ()
+;;   "Starts clojure in Slime"
+;;   (interactive)
+;;   (slime 'clojure))
+
+;;; Standard ML
+(add-path "sml")
+(autoload 'sml-mode "sml-mode" "Major mode for editing SML." t)
+(autoload 'run-sml "sml-proc" "Run an inferior SML process." t)
+(add-to-list 'auto-mode-alist '("\\.\\(sml\\|sig\\)\\'" . sml-mode))
 
 ;;; OpenGL Mode
 (message "applying OpenGL settings ...")
