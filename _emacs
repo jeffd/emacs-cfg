@@ -5,6 +5,7 @@
 (add-to-list 'load-path custom-basedir)
 (add-to-list 'load-path "/usr/local/plt/bin")
 (add-to-list 'load-path "/usr/local/bin")
+(add-to-list 'load-path "/usr/local/bin/python")
 (add-to-list 'load-path "/usr/local/git/bin/")
 
 (defun add-path (p)
@@ -21,11 +22,20 @@
 (setq inhibit-start-screen 1)
 (setq inhibit-splash-screen 1)
 
+(setq visible-bell (eq system-type 'gnu/linux))
+
+;;; Mac keyboard on Linux
+(setq mac-command-key-is-meta t)
+(setq mac-command-modifier 'meta)
+
 ;;; I condem thee to Hell!
 (global-set-key (kbd "C-x C-c") nil)
 
 (setq mac-command-key-is-meta t)
 (setq mac-command-modifier 'meta)
+
+(setq-default tab-width 2)
+(setq-default indent-tabs-mode nil)
 
 ;;; Font Settings
 ;;;(set-fontset-font (frame-parameter nil 'font)
@@ -49,6 +59,11 @@
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-hook 'comint-output-filter-functions
           'comint-strip-ctrl-m)
+
+;;; Ack Trick
+(eval-after-load "shell"
+  '(progn
+     (define-key shell-mode-map (kbd "C-x p") 'find-file-at-point)))
 
 ;;; Smooth Scrolling
 (message "applying scrolling settings ...")
@@ -109,6 +124,11 @@
 (message "applying git settings ...")
 (require 'git)
 (require 'gitsum)
+
+;;; Mercurial
+(message "loading Mercurial settings ...")
+(add-path "ahg")
+(require 'ahg)
 
 ;;; Cursor and Line
 (message "applying cursor settings ...")
@@ -206,14 +226,9 @@
 ;;; (setq TeX-parse-self t)
 ;;; (setq-default TeX-master nil)
 
-;;; Ejacs
-;;;(add-path "js")
-;;;(autoload 'js-console "js-console" nil t)
-;;;(require 'json)
-
 ;;; JS Interpreter
-;(require 'js-comint)
-;(setq inferior-js-program-command "/usr/local/bin/objj")
+;; (require 'js-comint)
+;; (setq inferior-js-program-command "/usr/local/bin/objj")
 ;; (add-hook 'js2-mode-hook '(lambda ()
 ;; 			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
 ;; 			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
@@ -450,6 +465,22 @@
 
 (require 'django-html-mode)
 
+;;; Flymake and Python
+(when (load "flymake" t)
+  (defun flymake-pylint-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list "epylint" (list local-file))))
+
+  (add-to-list 'flymake-allowed-file-name-masks
+               '("\\.py\\'" flymake-pylint-init)))
+
+;;; nXHTML
+(load (expand-file-name "~/.emacs-cfg/emacs.d/nxhtml/autostart.el"))
+
 ;;; Artist Mode
 (autoload 'artist-mode "artist" "Enter artist-mode" t)
 (require 'artist)
@@ -479,6 +510,68 @@
 ;; (require 'w3m-search)
 ;; (add-to-list 'w3m-search-engine-alist
 ;;              '("emacs-wiki" "http://www.emacswiki.org/cgi-bin/wiki.pl?search=%s"))
+
+;;; Smart Tabs
+(setq-default tab-width 2)
+(setq cua-auto-tabify-rectangles nil)
+(defadvice align (around smart-tabs activate)
+  (let ((indent-tabs-mode nil)) ad-do-it))
+(defadvice align-regexp (around smart-tabs activate)
+  (let ((indent-tabs-mode nil)) ad-do-it))
+(defadvice indent-relative (around smart-tabs activate)
+  (let ((indent-tabs-mode nil)) ad-do-it))
+(defadvice indent-according-to-mode (around smart-tabs activate)
+  (let ((indent-tabs-mode indent-tabs-mode))
+    (if (memq indent-line-function
+              '(indent-relative
+                indent-relative-maybe))
+        (setq indent-tabs-mode nil))
+    ad-do-it))
+(defmacro smart-tabs-advice (function offset)
+  (defvaralias offset 'tab-width)
+  `(defadvice ,function (around smart-tabs activate)
+     (cond
+      (indent-tabs-mode
+       (save-excursion
+         (beginning-of-line)
+         (while (looking-at "\t*\\( +\\)\t+")
+           (replace-match "" nil nil nil 1)))
+       (setq tab-width tab-width)
+       (let ((tab-width fill-column)
+             (,offset fill-column))
+         ad-do-it))
+      (t
+       ad-do-it))))
+
+;;; Web Development
+(setq css-indent-offset 2)
+(setq css-indent-level 2)
+(smart-tabs-advice js2-indent-line js2-basic-offset)
+
+;;; nXhtml
+(add-path "nxhtml")
+(load (expand-file-name "~/.emacs-cfg/emacs.d/nxhtml/autostart.el"))
+
+;;; JSLint
+(require 'flymake-jslint)
+
+
+;;; Javascript
+(require 'json)
+(add-hook 'js2-mode-hook
+   '(lambda ()
+   (setq js2-basic-offset 2)
+   (setq js2-use-font-lock-faces t)))
+
+;;; Ejacs
+(add-path "js")
+(autoload 'js-console "js-console" nil t)
+(setq auto-mode-alist
+      (append '(("\\.js\\'" . js2-mode)
+                ("\\.json\\'" . js2-mode))
+              auto-mode-alist))
+
+
 
 ;;; Gnu Server Settings
 (message "applying gnuserv settings ...")
