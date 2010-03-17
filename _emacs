@@ -565,10 +565,29 @@
               auto-mode-alist))
 
 
+;;; BNF Fontlock
+(message "Loading BNF Mode ...")
+(define-generic-mode 'bnf-mode
+  () ;; comment char: inapplicable because # must be at start of line
+  nil ;; keywords
+  '(
+    ("^#.*" . 'font-lock-comment-face) ;; comments at start of line
+    ("^<.*?>" . 'font-lock-function-name-face) ;; LHS nonterminals
+    ("<.*?>" . 'font-lock-builtin-face) ;; other nonterminals
+    ("::=" . 'font-lock-const-face) ;; "goes-to" symbol
+    ("\|" . 'font-lock-warning-face) ;; "OR" symbol
+    ("\{:\\|:\}" . 'font-lock-keyword-face) ;; special pybnf delimiters
+   )
+  '("\\.bnf\\'" "\\.pybnf\\'") ;; filename suffixes
+  nil ;; extra function hooks
+  "Major mode for BNF highlighting.")
+
+(setq auto-mode-alist
+      (append '(("\\.grm\\'" . bnf-mode))
+              auto-mode-alist))
 
 ;;; Gnu Server Settings
-(message "applying gnuserv settings ...")
-(cond ((eq system-type 'darwin)
+(message "applying gnuserv settings ...")(cond ((eq system-type 'darwin)
        (autoload 'gnuserv-start "gnuserv-compat"
          "Allow this Emacs process to be a server for client processes." t)
        (gnuserv-start))
