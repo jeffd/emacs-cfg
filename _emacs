@@ -474,6 +474,13 @@
 ;;; nXHTML
 (load (expand-file-name "~/.emacs-cfg/emacs.d/nxhtml/autostart.el"))
 
+;;; Zencoding
+(message "applying zencoding settings ...")
+(add-path "zencoding")
+(require 'zencoding-mode)
+;; Auto-start on any markup modes
+(add-hook 'sgml-mode-hook 'zencoding-mode)
+
 ;;; Artist Mode
 (autoload 'artist-mode "artist" "Enter artist-mode" t)
 (require 'artist)
