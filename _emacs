@@ -587,10 +587,17 @@
               auto-mode-alist))
 
 ;;; Gnu Server Settings
-(message "applying gnuserv settings ...")(cond ((eq system-type 'darwin)
+(message "applying gnuserv settings ...")
+(cond ((eq system-type 'darwin)
        (autoload 'gnuserv-start "gnuserv-compat"
          "Allow this Emacs process to be a server for client processes." t)
        (gnuserv-start))
       ((eq system-type 'gnu/linux)
        (server-start)))
 
+;;; Chrome Edit Server
+(if (locate-library "edit-server")
+    (progn
+      (require 'edit-server)
+      (setq edit-server-new-frame nil)
+      (edit-server-start)))
