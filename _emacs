@@ -101,17 +101,10 @@
        (global-set-key [f11] 'switch-full-screen)))
 
 (cond ((eq system-type 'darwin)
-       (defun toggle-fullscreen ()
-         (interactive)
-         (set-frame-parameter nil 'fullscreen (if (frame-parameter nil 'fullscreen)
-                                                  nil
-                                                'fullboth)))
-
-       (global-set-key [(meta return)] 'toggle-fullscreen)))
+       (global-set-key [(meta return)] 'ns-toggle-fullscreen)))
 
 ;;; Snippet settings
-(message "loading yasnippet customizations ...")
-(add-path "yasnippet")
+(message "loading yasnippet customizations ...")(add-path "yasnippet")
 (require 'yasnippet)
 
 (yas/initialize)
