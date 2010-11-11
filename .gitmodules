@@ -7,3 +7,6 @@
 [submodule "emacs.d/slime48"]
 	path = emacs.d/slime48
 	url = git@github.com:jeffd/slime48.git
+[submodule "emacs.d/html5"]
+	path = emacs.d/html5
+	url = http://github.com/hober/html5-el.git
