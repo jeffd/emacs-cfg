@@ -1,4 +1,11 @@
+;;; -*- Mode: Emacs-Lisp -*-
 ;;; Jeff Dlouhy's Emacs Settings
+;;;
+;;; This has git submodules and may fail to load if
+;;; they are not downloaded. Do so by running:
+;;;   git submodule init
+;;;   git submodule update
+
 (message "started loading settings ...")
 
 (setq custom-basedir (expand-file-name "~/.emacs-cfg/emacs.d/"))
@@ -37,10 +44,17 @@
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
 
-;;; Font Settings
-;;;(set-fontset-font (frame-parameter nil 'font)
-;;;                  'han '("cwTeXHei" . "unicode-bmp"))
+;;; Custom Vairables
+(message "applying gnuserv settings ...")
+(custom-set-variables
+ '(scheme48-keywords (quote ((dynamic-wind 0 nil) (destructure 1 nil) (enum-case 2 nil) (environment-define! 2 no-font-lock) (environment-set! 2 no-font-lock) (guard 1 nil) (iterate 3 nil) (make-usual-resumer 2 no-font-lock) (mvlet 1 nil) (mvlet* 1 nil) (search-tree-modify! 2 no-font-lock) (usual-resumer 0 no-font-lock) (with-exception-handler 1 nil) (with-handler 1 nil) (with-interaction-environment 1 nil) (with-nondeterminism 0 nil) (call-with-current-input-port 1 nil) (call-with-current-noise-port 1 nil) (call-with-current-output-port 1 nil) (call-with-string-output-port 0 nil) (limit-output 2 no-font-lock) (recurring-write 2 no-font-lock) (silently 0 nil) (with-current-ports 3 nil) (define-interface 1 nil) (define-structure 2 nil) (structure 1 nil) (structures 1 nil) (export 0 nil) (atomically 0 nil) (atomically! 0 nil) (call-ensuring-atomicity 0 nil) (call-ensuring-atomicity! 0 nil) (ensure-atomicity 0 nil) (ensure-atomicity! 0 nil) (interrupt-thread 1 no-font-lock) (let-fluid 2 nil) (let-fluids defun nil) (spawn-on-scheduler 1 no-font-lock) (with-new-proposal 1 nil) (with-current-input-port 2 nil) (with-current-output-port 2 nil) (awk 3 nil) (close-after 2 no-font-lock) (if-match 2 nil) (with-cwd 1 nil) (with-cwd* 1 nil) (let-optionals scheme-let-indent nil) (let-optionals* scheme-let-indent nil) (and-let* 1 nil) (let-values 1 nil) (let*-values 1 nil))))
+ '(texinfo-mode-hook (quote (turn-on-auto-fill))))
 
+;;; Font Settings
+;;;
+;;; You can get Consolas for Linux by following these instructions
+;;; http://igordevlog.blogspot.com/2007/05/how-to-consolas-font-in-linux.html
+;;;
 (message "applying font settings ...")
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
@@ -311,15 +325,17 @@
 
 ;;; Scheme Settings
 (message "applying scheme settings ...")
+(autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
 (autoload 'scheme48-mode "scheme48.el" "Major mode for Scheme48 interaction." t)
 
-(setq auto-mode-alist
-      (append '(("\\.scm$" . scheme48-mode)
-                ("\\.ss$"  . scheme-mode) ; PLT & Chez
-                ("\\.sch$" . scheme-mode) ; Bigloo & Larceny
-                ("\\.sc$"  . scheme-mode) ; JMS
-                ("\\.asd$" . lisp-mode))  ; ASDF system files
-              auto-mode-alist))
+;(require 'scheme48)
+
+;; (add-hook ’hack-local-variables-hook
+;;            (lambda ()
+;;              (if (and (boundp ’scheme48-package)
+;;                       scheme48-package) (progn (scheme48-mode)
+;;                                                (hack-local-variables-prop-line)))))
+
 
 (add-hook 'scheme-mode-hook
           (lambda ()
@@ -334,10 +350,37 @@
                       (or (+ ";") "#|")
                       (* (any " \t")))))))
 
-(require 'scheme48)
+
+
+(autoload 'scheme48-safe-variable "scheme48"
+  "Return non-nil when VAR is a valid value of `scheme48-package'.")
+
+(put 'scheme48-package 'safe-local-variable 'scheme48-safe-variable)
+
+(defun maybe-scheme48-mode ()
+  "Enter Scheme48 Mode if `scheme48-package' is non-nil.
+Hack the local variables after doing so in order to maintain the value
+  of the `scheme48-package' variable if it was set in the `-*-' line."
+  (if (and (eq major-mode 'scheme-mode)
+           (boundp 'scheme48-package)
+           scheme48-package)
+      (progn
+        (scheme48-mode)
+        (hack-local-variables))))
+
+(add-hook 'hack-local-variables-hook 'maybe-scheme48-mode)
+
 (add-to-list 'interpreter-mode-alist '("scsh" . scheme48-mode))
-(setq scheme-program-name "nuscsh")
+(setq scheme-program-name "scsh")
 (if window-system (show-paren-mode +1))
+
+(setq auto-mode-alist
+      (append '(("\\.scm$" . scheme48-mode)
+                ("\\.ss$"  . scheme-mode) ; PLT & Chez
+                ("\\.sch$" . scheme-mode) ; Bigloo & Larceny
+                ("\\.sc$"  . scheme-mode) ; JMS
+                ("\\.asd$" . lisp-mode))  ; ASDF system files
+              auto-mode-alist))
 
 ;;; LET (it be)
 (message "applying LET settings ...")
@@ -373,11 +416,20 @@
 ;;; Slime
 (message "applying SLIME settings ...")
 (add-path "slime")
-(require 'slime)
-(slime-setup)
-
-;;; Slime48
 (add-path "slime48")
+;; (require 'slime)
+;; (slime-setup)
+
+(autoload 'slime "slime"
+  "Start an inferior^_superior Lisp and connect to its Swank server."
+  t)
+
+(autoload 'slime-mode "slime"
+  "SLIME: The Superior Lisp Interaction Mode for Emacs (minor-mode)."
+  t)
+
+;;; slime48
+
 (eval-after-load "slime"
   '(progn
      (slime-setup)
@@ -403,14 +455,14 @@
                            (princ scheme48-package)))))))
 
 ;;; Clojure
-(message "applying Clojure settings ...")
-(eval-after-load "clojure-mode"
-  '(progn
-     (defun clojure-paredit-hook () (paredit-mode +1))
-     (add-hook 'clojure-mode-hook 'clojure-paredit-hook)
+;; (message "applying Clojure settings ...")
+;; (eval-after-load "clojure-mode"
+;;   '(progn
+;;      (defun clojure-paredit-hook () (paredit-mode +1))
+;;      (add-hook 'clojure-mode-hook 'clojure-paredit-hook)
 
-     (define-key clojure-mode-map "{" 'paredit-open-brace)
-     (define-key clojure-mode-map "}" 'paredit-close-brace)))
+;;      (define-key clojure-mode-map "{" 'paredit-open-brace)
+;;      (define-key clojure-mode-map "}" 'paredit-close-brace)))
 
 ;;; Clojure swank
 ;;(setq swank-clojure-jar-path "~/Development/Clojure/clojure_1.0.0/clojure.jar")
@@ -471,9 +523,6 @@
   (add-to-list 'flymake-allowed-file-name-masks
                '("\\.py\\'" flymake-pylint-init)))
 
-;;; nXHTML
-(load (expand-file-name "~/.emacs-cfg/emacs.d/nxhtml/autostart.el"))
-
 ;;; Zencoding
 (message "applying zencoding settings ...")
 (add-path "zencoding")
@@ -502,7 +551,7 @@
 ;;       (require 'w3m-load))
 ;;   (require 'w3m))
 
-;; (setq browse-url-browser-function 'w3m-browse-url)
+;(setq browse-url-browser-function 'w3-fetch)
 ;;  (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
 ;;  ;; optional keyboard short-cut
 ;;  (global-set-key "\C-xm" 'browse-url-at-point)
@@ -551,6 +600,15 @@
 ;;; nXhtml
 (add-path "nxhtml")
 (load (expand-file-name "~/.emacs-cfg/emacs.d/nxhtml/autostart.el"))
+(setq mumamo-chunk-coloring 'no-chunks-colored)
+
+;;; HTML5
+;;; Must add the submodule then run 'make relaxng' to get the schemas
+(add-path "html5")
+(eval-after-load "rng-loc"
+  '(add-to-list 'rng-schema-locating-files "~/.emacs-cfg/emacs.d/html5/schemas.xml"))
+
+(require 'whattf-dt)
 
 ;;; JSLint
 (require 'flymake-jslint)
