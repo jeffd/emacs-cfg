@@ -1,1 +1,6 @@
 .svn/
+*~
+\#*\#
+.#*
+TAGS
+.DS_Store
