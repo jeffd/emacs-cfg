@@ -117,15 +117,33 @@
 (cond ((eq system-type 'darwin)
        (global-set-key [(meta return)] 'ns-toggle-fullscreen)))
 
+
+
+;;; Auto-Complete
+;;; It is easy to install by using a installation script called etc/install.el that is located in the package directory.
+;;;
+;;; Type M-x load-file RET
+;;;
+(message "loading Auto-Complete ...")
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories "~/.emacs-cfg/emacs.d/ac-dict")
+(ac-config-default)
+
 ;;; Snippet settings
-(message "loading yasnippet customizations ...")(add-path "yasnippet")
+(message "loading yasnippet customizations ...")
+(add-path "yasnippet")
 (require 'yasnippet)
 
 (yas/initialize)
-(yas/load-directory "~/.emacs-cfg/emacs.d/yasnippet/")
+(yas/load-directory "~/.emacs-cfg/emacs.d/yasnippet/snippets")
 
 (setq yas/extra-mode-hooks
       '(ruby-mode-hook actionscript-mode-hook ox-mode-hook objc-mode-hook cc-mode-hook python-mode-hook))
+
+;;;using YASnippet with AutoComplete
+(load "auto-complete-yasnippet.el")
+;(require 'auto-complete-yasnippet)
+(message "auto-complete-yasnippet load successful")
 
 ;;; Git
 (message "applying git settings ...")
@@ -543,7 +561,7 @@ Hack the local variables after doing so in order to maintain the value
 
 
 ;;; w3m
-;; (message "applying browser settings ...")
+(message "applying browser settings ...")
 ;; (if (and (= emacs-major-version 23)
 ;;          (eq system-type 'gnu/linux))
 ;;     (progn
@@ -551,12 +569,12 @@ Hack the local variables after doing so in order to maintain the value
 ;;       (require 'w3m-load))
 ;;   (require 'w3m))
 
-;(setq browse-url-browser-function 'w3-fetch)
-;;  (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
-;;  ;; optional keyboard short-cut
-;;  (global-set-key "\C-xm" 'browse-url-at-point)
+(setq browse-url-browser-function 'w3-fetch)
+ (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
+ ;; optional keyboard short-cut
+ (global-set-key "\C-xm" 'browse-url-at-point)
 
-;; (require 'w3m-search)
+;(require 'w3m-search)
 ;; (add-to-list 'w3m-search-engine-alist
 ;;              '("emacs-wiki" "http://www.emacswiki.org/cgi-bin/wiki.pl?search=%s"))
 
@@ -612,7 +630,6 @@ Hack the local variables after doing so in order to maintain the value
 
 ;;; JSLint
 (require 'flymake-jslint)
-
 
 ;;; Javascript
 (require 'json)
