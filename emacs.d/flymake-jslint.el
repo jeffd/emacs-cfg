@@ -1,6 +1,6 @@
 (require 'flymake)
 
-(setq flymake-js-method 'rhino)
+(setq flymake-js-method 'closure)
 (defun flymake-js-toggle-method ()
   (interactive)
   (let ((methods '#1=(spidermonkey jslint . #1#)))
@@ -9,13 +9,18 @@
 
 (defun flymake-js-init ()
   (let* ((temp-file (flymake-init-create-temp-buffer-copy
-		     'flymake-create-temp-inplace))
+                     'flymake-create-temp-inplace))
          (local-file (file-relative-name
-		      temp-file
-		      (file-name-directory buffer-file-name))))
-    (if (eq flymake-js-method 'spidermonkey)
-        (list "smjs" (list "-s" "-e" (format "load('%s')" (expand-file-name "/path/to/mock.js")) local-file))
-        (list "java" (list  "-cp" "/usr/local/rhino/js.jar" "org.mozilla.javascript.tools.shell.Main" (expand-file-name "~/.emacs-cfg/emacs.d/jslint.js") local-file)))))
+                      temp-file
+                      (file-name-directory buffer-file-name))))
+    (cond ((eq flymake-js-method 'spidermonkey)
+           (list "smjs" (list "-s" "-e" (format "load('%s')" (expand-file-name "/path/to/mock.js")) local-file)))
+          ((eq flymake-js-method 'rhino)
+           (list "java" (list  "-cp" "/usr/local/rhino/js.jar" "org.mozilla.javascript.tools.shell.Main" (expand-file-name "~/.emacs-cfg/emacs.d/jslint.js") local-file)))
+          ((eq flymake-js-method 'closure)
+           ;;; brew install closure-compiler
+           ;;; sudo ln -s /usr/local/bin/closure /bin/closure
+           (list "closure" (list "--warning_level" "VERBOSE" "--js_output_file" "/dev/null" "--js" local-file))))))
 
 
 (eval-after-load "flymake"
