@@ -10,10 +10,10 @@
 
 (setq custom-basedir (expand-file-name "~/.emacs-cfg/emacs.d/"))
 (add-to-list 'load-path custom-basedir)
-(add-to-list 'load-path "/usr/local/plt/bin")
-(add-to-list 'load-path "/usr/local/bin")
-(add-to-list 'load-path "/usr/local/bin/python")
-(add-to-list 'load-path "/usr/local/git/bin/")
+(add-to-list 'exec-path "/usr/local/plt/bin")
+(add-to-list 'exec-path "/usr/local/bin")
+(add-to-list 'exec-path "/usr/local/bin/python")
+(add-to-list 'exec-path "/usr/local/git/bin/")
 
 (defun add-path (p)
   (add-to-list 'load-path (concat custom-basedir p)))
@@ -83,6 +83,14 @@
 (message "applying scrolling settings ...")
 (setq scroll-step 1
       scroll-conservatively 10000)
+
+;;; Spelling Setting
+;;;
+;;; brew install aspell --lang=en
+;;;
+(message "applying scrolling settings ...")
+(setq ispell-program-name "aspell"
+  ispell-extra-args '("--sug-mode=ultra"))
 
 ;;; Compile Settings
 (require 'smart-compile)
