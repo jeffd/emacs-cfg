@@ -542,11 +542,11 @@ Hack the local variables after doing so in order to maintain the value
                '("\\.py\\'" flymake-pylint-init)))
 
 ;;; Zencoding
-(message "applying zencoding settings ...")
-(add-path "zencoding")
-(require 'zencoding-mode)
-;; Auto-start on any markup modes
-(add-hook 'sgml-mode-hook 'zencoding-mode)
+;; (message "applying zencoding settings ...")
+;; (add-path "zencoding")
+;; (require 'zencoding-mode)
+;; ;; Auto-start on any markup modes
+;; (add-hook 'sgml-mode-hook 'zencoding-mode)
 
 ;;; Artist Mode
 (autoload 'artist-mode "artist" "Enter artist-mode" t)
