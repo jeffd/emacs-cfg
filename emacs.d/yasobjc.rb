@@ -11,7 +11,7 @@ Basic Usage: yasobjc.rb -o DIR file1 file 2 ...
 
 -o DIR: The output directory for the snippets generated
 
-Example: find /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.0.sdk/System/Library/Frameworks -name "*.h" | xargs yasobjc.rb -o ~/.emacs.d/yasnippet/text-mode/cc-mode/objc-mode
+Example: find /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.x.sdk/System/Library/Frameworks -name "*.h" | xargs ~/.emacs-cfg/emacs.d/yasobjc.rb -o ~/.emacs-cfg/emacs.d/yasnippet/snippets/text-mode/cc-mode/objc-mode
 
 which will generate all snippets into standard yasnippet directory.
 
