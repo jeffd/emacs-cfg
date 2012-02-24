@@ -634,10 +634,30 @@ Hack the local variables after doing so in order to maintain the value
 (eval-after-load "rng-loc"
   '(add-to-list 'rng-schema-locating-files "~/.emacs-cfg/emacs.d/html5/schemas.xml"))
 
-(require 'whattf-dt)
+;(require 'whattf-dt)
+
+;;; js2-mode & Ejacs
+(add-path "js2-mode")
+(autoload 'js2-mode "js2-mode" nil t)
+;(autoload 'js-console "js-console" nil t)
+(setq auto-mode-alist
+      (append '(("\\.js$" . js2-mode))
+              auto-mode-alist))
+
+;(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+
+;;; js2 addons
+(add-path "mark-multiple")
+(add-path "js2-refactor")
+(require 'js2-highlight-vars)
+(require 'js2-refactor)
+
+(define-key js2-mode-map (kbd "C-c C-r") 'js2-rename-var)
 
 ;;; JSLint
 (require 'flymake-jslint)
+(add-hook 'js2-mode-hook
+	  (lambda () (flymake-mode 1)))
 
 ;;; Javascript
 (require 'json)
@@ -646,14 +666,14 @@ Hack the local variables after doing so in order to maintain the value
    (setq js2-basic-offset 2)
    (setq js2-use-font-lock-faces t)))
 
-;;; Ejacs
-(add-path "js")
-(autoload 'js-console "js-console" nil t)
-(setq auto-mode-alist
-      (append '(("\\.js\\'" . js2-mode)
-                ("\\.json\\'" . js2-mode))
-              auto-mode-alist))
 
+;;; Roku BrightScript
+;;; https://bitbucket.org/markroddy/brightscript-mode/overview
+(add-path "brightscript-mode")
+(require 'brightscript-mode)
+(setq auto-mode-alist
+      (append '(("\\.brs\\'" . brightscript-mode))
+              auto-mode-alist))
 
 ;;; BNF Fontlock
 (message "Loading BNF Mode ...")
