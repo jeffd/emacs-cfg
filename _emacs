@@ -696,6 +696,10 @@ Hack the local variables after doing so in order to maintain the value
       (append '(("\\.grm\\'" . bnf-mode))
               auto-mode-alist))
 
+;;; Lua
+(require 'flymake-lua)
+(add-hook 'lua-mode-hook 'flymake-lua-load)
+
 ;;; Gnu Server Settings
 (message "applying gnuserv settings ...")
 (cond ((eq system-type 'darwin)
