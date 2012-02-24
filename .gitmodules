@@ -10,3 +10,12 @@
 [submodule "emacs.d/html5"]
 	path = emacs.d/html5
 	url = http://github.com/hober/html5-el.git
+[submodule "emacs.d/js2-mode"]
+	path = emacs.d/js2-mode
+	url = git://github.com/mooz/js2-mode.git
+[submodule "emacs.d/mark-multiple"]
+	path = emacs.d/mark-multiple
+	url = https://github.com/magnars/mark-multiple.el.git
+[submodule "emacs.d/js2-refactor"]
+	path = emacs.d/js2-refactor
+	url = git://github.com/magnars/js2-refactor.el.git
