@@ -10,20 +10,36 @@
 
 (setq custom-basedir (expand-file-name "~/.emacs-cfg/emacs.d/"))
 (add-to-list 'load-path custom-basedir)
+(add-to-list 'exec-path "~/.emacs-cfg/emacs.d")
 (add-to-list 'exec-path "/usr/local/plt/bin")
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "/usr/local/bin/python")
 (add-to-list 'exec-path "/usr/local/git/bin/")
+(add-to-list 'exec-path "/usr/texbin")
+(add-to-list 'exec-path "/Applications/Graphviz.app/Contents/MacOS/")
 
 (defun add-path (p)
   (add-to-list 'load-path (concat custom-basedir p)))
 
 ;;; Emacs Lisp Package Archive
+;;; This provides support for the package system and
+;;; interfacing with ELPA, the package archive.
 (message "applying ELPA settings ...")
 (setq package-user-dir "~/.emacs-cfg/emacs.d/elpa")
-(add-path "elpa")
-(load "package")
-(package-initialize)
+(when
+    (load
+     (expand-file-name "~/.emacs-cfg/emacs.d/elpa/package.el"))
+  (package-initialize))
+
+;; (add-to-list 'package-archives
+;;              '("marmalade" . "http://marmalade-repo.org/packages/") t)
+
+;; (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
+;;                          ("gnu" . "http://elpa.gnu.org/packages/")))
+
+;; (add-path "elpa")
+;; (load "package")
+;; (package-initialize)
 
 ;;; Will remove when there is a true GNU Operating System
 (setq inhibit-start-screen 1)
@@ -37,9 +53,6 @@
 
 ;;; I condem thee to Hell!
 (global-set-key (kbd "C-x C-c") nil)
-
-(setq mac-command-key-is-meta t)
-(setq mac-command-modifier 'meta)
 
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
@@ -74,7 +87,14 @@
 (add-hook 'comint-output-filter-functions
           'comint-strip-ctrl-m)
 
-;;; Ack Trick
+;;; Full Ack
+(add-path "full-ack")
+(autoload 'ack-same "full-ack" nil t)
+(autoload 'ack "full-ack" nil t)
+(autoload 'ack-find-same-file "full-ack" nil t)
+(autoload 'ack-find-file "full-ack" nil t)
+
+;;; Ack Shell Trick
 (eval-after-load "shell"
   '(progn
      (define-key shell-mode-map (kbd "C-x p") 'find-file-at-point)))
@@ -481,14 +501,14 @@ Hack the local variables after doing so in order to maintain the value
                            (princ scheme48-package)))))))
 
 ;;; Clojure
-;; (message "applying Clojure settings ...")
-;; (eval-after-load "clojure-mode"
-;;   '(progn
-;;      (defun clojure-paredit-hook () (paredit-mode +1))
-;;      (add-hook 'clojure-mode-hook 'clojure-paredit-hook)
+(message "applying Clojure settings ...")
+(eval-after-load "clojure-mode"
+  '(progn
+     (defun clojure-paredit-hook () (paredit-mode +1))
+     (add-hook 'clojure-mode-hook 'clojure-paredit-hook)
 
-;;      (define-key clojure-mode-map "{" 'paredit-open-brace)
-;;      (define-key clojure-mode-map "}" 'paredit-close-brace)))
+     (define-key clojure-mode-map "{" 'paredit-open-brace)
+     (define-key clojure-mode-map "}" 'paredit-close-brace)))
 
 ;;; Clojure swank
 ;;(setq swank-clojure-jar-path "~/Development/Clojure/clojure_1.0.0/clojure.jar")
@@ -502,10 +522,10 @@ Hack the local variables after doing so in order to maintain the value
 ;;; The following function runs Slime with Clojure, even if Slime defaults to another Lisp.
 ;;; The above configuration alone, however, will make Clojure the default, so all that is necessary
 ;;; to run Slime with Clojure is M-x slime.
-;; (defun run-clojure ()
-;;   "Starts clojure in Slime"
-;;   (interactive)
-;;   (slime 'clojure))
+(defun run-clojure ()
+  "Starts clojure in Slime"
+  (interactive)
+  (slime 'clojure))
 
 ;;; Standard ML
 (add-path "sml")
@@ -666,7 +686,6 @@ Hack the local variables after doing so in order to maintain the value
    (setq js2-basic-offset 2)
    (setq js2-use-font-lock-faces t)))
 
-
 ;;; Roku BrightScript
 ;;; https://bitbucket.org/markroddy/brightscript-mode/overview
 (add-path "brightscript-mode")
@@ -674,6 +693,23 @@ Hack the local variables after doing so in order to maintain the value
 (setq auto-mode-alist
       (append '(("\\.brs\\'" . brightscript-mode))
               auto-mode-alist))
+
+;;; CoffeeScript
+(add-path "coffee-mode")
+(require 'coffee-mode)
+(add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
+(add-to-list 'auto-mode-alist '("Cakefile" . coffee-mode))
+
+(defun coffee-custom ()
+  "coffee-mode-hook"
+ (set (make-local-variable 'tab-width) 2))
+
+(add-hook 'coffee-mode-hook
+  '(lambda() (coffee-custom)))
+
+;;; Ejacs
+(add-path "js")
+(autoload 'js-console "js-console" nil t)
 
 ;;; BNF Fontlock
 (message "Loading BNF Mode ...")
@@ -700,6 +736,32 @@ Hack the local variables after doing so in order to maintain the value
 (require 'flymake-lua)
 (add-hook 'lua-mode-hook 'flymake-lua-load)
 
+;;; Markdown Mode
+(message "applying Markdown settings ...")
+(autoload 'markdown-mode "markdown-mode.el"
+  "Major mode for editing Markdown files" t)
+(setq auto-mode-alist
+      (cons '("README" . markdown-mode) auto-mode-alist))
+
+;;; Graphviz DOT Language
+(autoload 'graphviz-dot-mode "graphviz-dot-mode.el"
+  "Major mode for editing Graphviz DOT files" t)
+(setq auto-mode-alist
+      (cons '("\\.dot\\'" . graphviz-dot-mode) auto-mode-alist))
+
+;;; AucTeX
+;;;
+;;; Installed on OS X with
+;;; ./configure --with-emacs=/Applications/Emacs.app/Contents/MacOS/Emacs --with-lispdir=/Applications/Emacs.app/Contents/Resources/site-lisp --with-texmf-dir=/usr/local/texlive/texmf-local
+;;;
+;;; From http://superuser.com/questions/171681/installing-auctex-1-86-over-emacs-app-in-os-x
+;;;
+;; (setenv "PATH" (concat "/usr/texbin:/usr/local/bin:" (getenv "PATH")))
+;; (setq exec-path (append '("/usr/texbin" "/usr/local/bin") exec-path))
+;; (load "auctex.el" nil t t)
+;; (load "preview-latex.el" nil t t)
+>>>>>>> Stashed changes
+
 ;;; Gnu Server Settings
 (message "applying gnuserv settings ...")
 (cond ((eq system-type 'darwin)
@@ -715,3 +777,5 @@ Hack the local variables after doing so in order to maintain the value
       (require 'edit-server)
       (setq edit-server-new-frame nil)
       (edit-server-start)))
+
+

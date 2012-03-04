@@ -3,7 +3,7 @@
 	url = git://github.com/nablaone/slime.git
 [submodule "emacs.d/swank-clojure"]
 	path = emacs.d/swank-clojure
-	url = git://github.com/jochu/swank-clojure.git
+	url = https://github.com/technomancy/swank-clojure
 [submodule "emacs.d/slime48"]
 	path = emacs.d/slime48
 	url = git@github.com:jeffd/slime48.git
@@ -19,3 +19,9 @@
 [submodule "emacs.d/js2-refactor"]
 	path = emacs.d/js2-refactor
 	url = git://github.com/magnars/js2-refactor.el.git
+[submodule "emacs.d/full-ack"]
+	path = emacs.d/full-ack
+	url = https://github.com/nschum/full-ack.git
+[submodule "emacs.d/coffee-mode"]
+	path = emacs.d/coffee-mode
+	url = https://github.com/defunkt/coffee-mode.git
