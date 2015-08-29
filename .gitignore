@@ -5,3 +5,4 @@
 TAGS
 .DS_Store
 *.elc
+emacs.d/elpa/*

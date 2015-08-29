@@ -25,11 +25,26 @@
 ;;; This provides support for the package system and
 ;;; interfacing with ELPA, the package archive.
 (message "applying ELPA settings ...")
+
+(require 'package) ;; You might already have this line
 (setq package-user-dir "~/.emacs-cfg/emacs.d/elpa")
-(when
-    (load
-     (expand-file-name "~/.emacs-cfg/emacs.d/elpa/package.el"))
-  (package-initialize))
+(add-to-list 'package-archives
+             '("elpa" . "http://tromey.com/elpa/"))
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/") t)
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(package-initialize) ;; You might already have this line
+
+
+;; (when
+;;     (load
+;;      (expand-file-name "~/.emacs-cfg/emacs.d/elpa/package.el"))
+;;   (package-initialize))
+
+
+
 
 ;; (add-to-list 'package-archives
 ;;              '("marmalade" . "http://marmalade-repo.org/packages/") t)
@@ -79,8 +94,8 @@
 (require 'color-theme)
 (setq color-theme-is-global t)
 (color-theme-initialize)
-(color-theme-comidia)
-
+;(color-theme-comidia)
+(color-theme-solarized-dark)
 ;;; Shell Settings
 (message "applying shell settings ...")
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
@@ -116,9 +131,11 @@
 (require 'smart-compile)
 
 ;;; C-x b
-(require 'iswitchb)
+(require 'iswitchb) ; Apparenly Obsolete now
 (iswitchb-mode 1)
 
+;(require 'ido) ; But I don't like this
+;(ido-mode t)
 ;;; Narrowing
 (put 'narrow-to-region 'disabled nil)
 
@@ -158,25 +175,27 @@
 (ac-config-default)
 
 ;;; Snippet settings
-(message "loading yasnippet customizations ...")
-(add-path "yasnippet")
-(require 'yasnippet)
+;; (message "loading yasnippet customizations ...")
+;; (add-path "yasnippet")
+;; (require 'yasnippet)
 
-(yas/initialize)
-(yas/load-directory "~/.emacs-cfg/emacs.d/yasnippet/snippets")
+;; (yas/initialize)
+;; (yas/load-directory "~/.emacs-cfg/emacs.d/yasnippet/snippets")
 
-(setq yas/extra-mode-hooks
-      '(ruby-mode-hook actionscript-mode-hook ox-mode-hook objc-mode-hook cc-mode-hook python-mode-hook))
+;; (setq yas/extra-mode-hooks
+;;       '(ruby-mode-hook actionscript-mode-hook ox-mode-hook objc-mode-hook cc-mode-hook python-mode-hook))
 
-;;;using YASnippet with AutoComplete
-(load "auto-complete-yasnippet.el")
-;(require 'auto-complete-yasnippet)
-(message "auto-complete-yasnippet load successful")
+;; ;;;using YASnippet with AutoComplete
+;; (load "auto-complete-yasnippet.el")
+;; ;(require 'auto-complete-yasnippet)
+;; (message "auto-complete-yasnippet load successful")
 
 ;;; Git
 (message "applying git settings ...")
 (require 'git)
 (require 'gitsum)
+
+(global-set-key (kbd "C-x g") 'magit-status)
 
 ;;; Mercurial
 (message "loading Mercurial settings ...")
@@ -200,6 +219,12 @@
 (require 'objc-c-mode)
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
+
+(add-hook 'swift-mode-hook
+          (lambda ()
+            (setq-local tab-width 2)
+            (defvar swift-indent-offset)
+            (setq-local swift-indent-offset 2)))
 
 ;;; Create my personal style.
 (defconst my-c-style
@@ -278,6 +303,9 @@
 ;;; (setq TeX-auto-save t)
 ;;; (setq TeX-parse-self t)
 ;;; (setq-default TeX-master nil)
+
+;;; Ruby Settings
+;(require 'inf-ruby)
 
 ;;; JS Interpreter
 ;; (require 'js-comint)
@@ -372,7 +400,7 @@
 ;;; Scheme Settings
 (message "applying scheme settings ...")
 (autoload 'run-scheme "cmuscheme" "Run an inferior Scheme process." t)
-(autoload 'scheme48-mode "scheme48.el" "Major mode for Scheme48 interaction." t)
+;(autoload 'scheme48-mode "scheme48.el" "Major mode for Scheme48 interaction." t)
 
 ;(require 'scheme48)
 
@@ -403,18 +431,18 @@
 
 (put 'scheme48-package 'safe-local-variable 'scheme48-safe-variable)
 
-(defun maybe-scheme48-mode ()
-  "Enter Scheme48 Mode if `scheme48-package' is non-nil.
-Hack the local variables after doing so in order to maintain the value
-  of the `scheme48-package' variable if it was set in the `-*-' line."
-  (if (and (eq major-mode 'scheme-mode)
-           (boundp 'scheme48-package)
-           scheme48-package)
-      (progn
-        (scheme48-mode)
-        (hack-local-variables))))
+;; (defun maybe-scheme48-mode ()
+;;   "Enter Scheme48 Mode if `scheme48-package' is non-nil.
+;; Hack the local variables after doing so in order to maintain the value
+;;   of the `scheme48-package' variable if it was set in the `-*-' line."
+;;   (if (and (eq major-mode 'scheme-mode)
+;;            (boundp 'scheme48-package)
+;;            scheme48-package)
+;;       (progn
+;;         (scheme48-mode)
+;;         (hack-local-variables))))
 
-(add-hook 'hack-local-variables-hook 'maybe-scheme48-mode)
+;; (add-hook 'hack-local-variables-hook 'maybe-scheme48-mode)
 
 (add-to-list 'interpreter-mode-alist '("scsh" . scheme48-mode))
 (setq scheme-program-name "scsh")
@@ -669,7 +697,7 @@ Hack the local variables after doing so in order to maintain the value
 ;;; js2 addons
 (add-path "mark-multiple")
 (add-path "js2-refactor")
-(require 'js2-highlight-vars)
+;(require 'js2-highlight-vars)
 (require 'js2-refactor)
 
 (define-key js2-mode-map (kbd "C-c C-r") 'js2-rename-var)
@@ -733,8 +761,8 @@ Hack the local variables after doing so in order to maintain the value
               auto-mode-alist))
 
 ;;; Lua
-(require 'flymake-lua)
-(add-hook 'lua-mode-hook 'flymake-lua-load)
+;; (require 'flymake-lua)
+;; (add-hook 'lua-mode-hook 'flymake-lua-load)
 
 ;;; Markdown Mode
 (message "applying Markdown settings ...")
@@ -749,6 +777,22 @@ Hack the local variables after doing so in order to maintain the value
 (setq auto-mode-alist
       (cons '("\\.dot\\'" . graphviz-dot-mode) auto-mode-alist))
 
+;;; APL Mode
+(add-path "gnu-apl-mode")
+(require 'gnu-apl-mode)
+
+;;; Usually, one wants to use a different font for APL buffers.
+;;; This mode includes a face called gnu-apl-default which is
+;;; used in various places, such as the help buffers. However,
+;;; it's not currently enabled by default in the interactive
+;;; session, nor in APL buffers.
+(defun em-gnu-apl-init ()
+  (setq buffer-face-mode-face 'gnu-apl-default)
+  (buffer-face-mode))
+
+(add-hook 'gnu-apl-interactive-mode-hook 'em-gnu-apl-init)
+(add-hook 'gnu-apl-mode-hook 'em-gnu-apl-init)
+
 ;;; AucTeX
 ;;;
 ;;; Installed on OS X with
@@ -760,22 +804,24 @@ Hack the local variables after doing so in order to maintain the value
 ;; (setq exec-path (append '("/usr/texbin" "/usr/local/bin") exec-path))
 ;; (load "auctex.el" nil t t)
 ;; (load "preview-latex.el" nil t t)
->>>>>>> Stashed changes
 
 ;;; Gnu Server Settings
-(message "applying gnuserv settings ...")
-(cond ((eq system-type 'darwin)
-       (autoload 'gnuserv-start "gnuserv-compat"
-         "Allow this Emacs process to be a server for client processes." t)
-       (gnuserv-start))
-      ((eq system-type 'gnu/linux)
-       (server-start)))
+;; (message "applying gnuserv settings ...")
+;; (cond ((eq system-type 'darwin)
+;;        (autoload 'gnuserv-start "gnuserv-compat"
+;;          "Allow this Emacs process to be a server for client processes." t)
+;;        (gnuserv-start))
+;;       ((eq system-type 'gnu/linux)
+;;        (server-start)))
 
-;;; Chrome Edit Server
-(if (locate-library "edit-server")
-    (progn
-      (require 'edit-server)
-      (setq edit-server-new-frame nil)
-      (edit-server-start)))
+;; ;;; Chrome Edit Server
+;; (if (locate-library "edit-server")
+;;     (progn
+;;       (require 'edit-server)
+;;       (setq edit-server-new-frame nil)
+;;       (edit-server-start)))
+
+;;; Swift
+;(add-to-list 'flycheck-checkers 'swift)
 
 
