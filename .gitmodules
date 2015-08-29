@@ -25,3 +25,6 @@
 [submodule "emacs.d/coffee-mode"]
 	path = emacs.d/coffee-mode
 	url = https://github.com/defunkt/coffee-mode.git
+[submodule "emacs.d/gnu-apl-mode"]
+	path = emacs.d/gnu-apl-mode
+	url = https://github.com/lokedhs/gnu-apl-mode.git
