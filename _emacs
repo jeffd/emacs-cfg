@@ -78,6 +78,13 @@
 (setq mac-command-key-is-meta t)
 (setq mac-command-modifier 'meta)
 
+;;; Mouse clicks on macOS
+;;; Via: https://joelkuiper.eu/spellcheck_emacs
+(eval-after-load "flyspell"
+  '(progn
+     (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+     (define-key flyspell-mouse-map [mouse-3] #'undefined)))
+
 ;;; I condem thee to Hell!
 (global-set-key (kbd "C-x C-c") nil)
 
@@ -200,15 +207,18 @@
 (setq ispell-program-name "aspell"
   ispell-extra-args '("--sug-mode=ultra"))
 
+(add-hook 'text-mode-hook 'flyspell-mode)
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)
+
 ;;; Compile Settings
 (require 'smart-compile)
 
 ;;; C-x b
-(require 'iswitchb) ; Apparenly Obsolete now
-(iswitchb-mode 1)
+;(require 'iswitchb) ; Apparenly Obsolete now
+;(iswitchb-mode 1)
 
-;(require 'ido) ; But I don't like this
-;(ido-mode t)
+(require 'ido) ; But I don't like this
+(ido-mode t)
 
 ;;; Narrowing
 (put 'narrow-to-region 'disabled nil)
