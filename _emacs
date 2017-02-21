@@ -11,6 +11,7 @@
 (setq custom-basedir (expand-file-name "~/.emacs-cfg/emacs.d/"))
 (add-to-list 'load-path custom-basedir)
 (add-to-list 'exec-path "~/.emacs-cfg/emacs.d")
+(add-to-list 'exec-path "/Applications/Racket/bin")
 (add-to-list 'exec-path "/usr/local/plt/bin")
 (add-to-list 'exec-path "/usr/local/bin")
 (add-to-list 'exec-path "/usr/local/bin/python")
@@ -37,24 +38,34 @@
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 (package-initialize) ;; You might already have this line
 
+(when (not package-archive-contents)
+  (package-refresh-contents))
 
-;; (when
-;;     (load
-;;      (expand-file-name "~/.emacs-cfg/emacs.d/elpa/package.el"))
-;;   (package-initialize))
+(defvar jeffsPackages
+  '(color-theme-solarized
+    magit
+    ein
+    elpy
+    js2-mode
+    mark-multiple
+    paredit
+    racket-mode
+    sml-mode
+    gnu-apl-mode
+    quack
+    swift-mode
+    csharp-mode
+    coffee-mode
+    slime
+    flycheck
+    py-autopep8
+    realgud
+    ))
 
-
-
-
-;; (add-to-list 'package-archives
-;;              '("marmalade" . "http://marmalade-repo.org/packages/") t)
-
-;; (setq package-archives '(("ELPA" . "http://tromey.com/elpa/")
-;;                          ("gnu" . "http://elpa.gnu.org/packages/")))
-
-;; (add-path "elpa")
-;; (load "package")
-;; (package-initialize)
+(mapc #'(lambda (package)
+    (unless (package-installed-p package)
+      (package-install package)))
+      jeffsPackages)
 
 ;;; Will remove when there is a true GNU Operating System
 (setq inhibit-start-screen 1)
@@ -75,7 +86,67 @@
 ;;; Custom Vairables
 (message "applying gnuserv settings ...")
 (custom-set-variables
- '(scheme48-keywords (quote ((dynamic-wind 0 nil) (destructure 1 nil) (enum-case 2 nil) (environment-define! 2 no-font-lock) (environment-set! 2 no-font-lock) (guard 1 nil) (iterate 3 nil) (make-usual-resumer 2 no-font-lock) (mvlet 1 nil) (mvlet* 1 nil) (search-tree-modify! 2 no-font-lock) (usual-resumer 0 no-font-lock) (with-exception-handler 1 nil) (with-handler 1 nil) (with-interaction-environment 1 nil) (with-nondeterminism 0 nil) (call-with-current-input-port 1 nil) (call-with-current-noise-port 1 nil) (call-with-current-output-port 1 nil) (call-with-string-output-port 0 nil) (limit-output 2 no-font-lock) (recurring-write 2 no-font-lock) (silently 0 nil) (with-current-ports 3 nil) (define-interface 1 nil) (define-structure 2 nil) (structure 1 nil) (structures 1 nil) (export 0 nil) (atomically 0 nil) (atomically! 0 nil) (call-ensuring-atomicity 0 nil) (call-ensuring-atomicity! 0 nil) (ensure-atomicity 0 nil) (ensure-atomicity! 0 nil) (interrupt-thread 1 no-font-lock) (let-fluid 2 nil) (let-fluids defun nil) (spawn-on-scheduler 1 no-font-lock) (with-new-proposal 1 nil) (with-current-input-port 2 nil) (with-current-output-port 2 nil) (awk 3 nil) (close-after 2 no-font-lock) (if-match 2 nil) (with-cwd 1 nil) (with-cwd* 1 nil) (let-optionals scheme-let-indent nil) (let-optionals* scheme-let-indent nil) (and-let* 1 nil) (let-values 1 nil) (let*-values 1 nil))))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
+ '(scheme48-keywords
+   (quote
+    ((dynamic-wind 0 nil)
+     (destructure 1 nil)
+     (enum-case 2 nil)
+     (environment-define! 2 no-font-lock)
+     (environment-set! 2 no-font-lock)
+     (guard 1 nil)
+     (iterate 3 nil)
+     (make-usual-resumer 2 no-font-lock)
+     (mvlet 1 nil)
+     (mvlet* 1 nil)
+     (search-tree-modify! 2 no-font-lock)
+     (usual-resumer 0 no-font-lock)
+     (with-exception-handler 1 nil)
+     (with-handler 1 nil)
+     (with-interaction-environment 1 nil)
+     (with-nondeterminism 0 nil)
+     (call-with-current-input-port 1 nil)
+     (call-with-current-noise-port 1 nil)
+     (call-with-current-output-port 1 nil)
+     (call-with-string-output-port 0 nil)
+     (limit-output 2 no-font-lock)
+     (recurring-write 2 no-font-lock)
+     (silently 0 nil)
+     (with-current-ports 3 nil)
+     (define-interface 1 nil)
+     (define-structure 2 nil)
+     (structure 1 nil)
+     (structures 1 nil)
+     (export 0 nil)
+     (atomically 0 nil)
+     (atomically! 0 nil)
+     (call-ensuring-atomicity 0 nil)
+     (call-ensuring-atomicity! 0 nil)
+     (ensure-atomicity 0 nil)
+     (ensure-atomicity! 0 nil)
+     (interrupt-thread 1 no-font-lock)
+     (let-fluid 2 nil)
+     (let-fluids defun nil)
+     (spawn-on-scheduler 1 no-font-lock)
+     (with-new-proposal 1 nil)
+     (with-current-input-port 2 nil)
+     (with-current-output-port 2 nil)
+     (awk 3 nil)
+     (close-after 2 no-font-lock)
+     (if-match 2 nil)
+     (with-cwd 1 nil)
+     (with-cwd* 1 nil)
+     (let-optionals scheme-let-indent nil)
+     (let-optionals* scheme-let-indent nil)
+     (and-let* 1 nil)
+     (let-values 1 nil)
+     (let*-values 1 nil))))
  '(texinfo-mode-hook (quote (turn-on-auto-fill))))
 
 ;;; Font Settings
@@ -96,6 +167,7 @@
 (color-theme-initialize)
 ;(color-theme-comidia)
 (color-theme-solarized-dark)
+
 ;;; Shell Settings
 (message "applying shell settings ...")
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
@@ -136,6 +208,7 @@
 
 ;(require 'ido) ; But I don't like this
 ;(ido-mode t)
+
 ;;; Narrowing
 (put 'narrow-to-region 'disabled nil)
 
@@ -163,7 +236,6 @@
        (global-set-key [(meta return)] 'ns-toggle-fullscreen)))
 
 
-
 ;;; Auto-Complete
 ;;; It is easy to install by using a installation script called etc/install.el that is located in the package directory.
 ;;;
@@ -174,27 +246,8 @@
 (add-to-list 'ac-dictionary-directories "~/.emacs-cfg/emacs.d/ac-dict")
 (ac-config-default)
 
-;;; Snippet settings
-;; (message "loading yasnippet customizations ...")
-;; (add-path "yasnippet")
-;; (require 'yasnippet)
-
-;; (yas/initialize)
-;; (yas/load-directory "~/.emacs-cfg/emacs.d/yasnippet/snippets")
-
-;; (setq yas/extra-mode-hooks
-;;       '(ruby-mode-hook actionscript-mode-hook ox-mode-hook objc-mode-hook cc-mode-hook python-mode-hook))
-
-;; ;;;using YASnippet with AutoComplete
-;; (load "auto-complete-yasnippet.el")
-;; ;(require 'auto-complete-yasnippet)
-;; (message "auto-complete-yasnippet load successful")
-
 ;;; Git
 (message "applying git settings ...")
-(require 'git)
-(require 'gitsum)
-
 (global-set-key (kbd "C-x g") 'magit-status)
 
 ;;; Mercurial
@@ -216,7 +269,6 @@
 
 ;;; C Style Settings
 (message "applying c style settings ...")
-(require 'objc-c-mode)
 (setq-default indent-tabs-mode nil)
 (setq tab-width 2)
 
@@ -225,6 +277,9 @@
             (setq-local tab-width 2)
             (defvar swift-indent-offset)
             (setq-local swift-indent-offset 2)))
+
+(setq swift-indent-offset 2)
+(setq swift-indent-hanging-comma-offset 2)
 
 ;;; Create my personal style.
 (defconst my-c-style
@@ -297,33 +352,6 @@
     (c-beginning-of-defun -1)
     (yank)))
 
-;;; AucTeX settings
-;;; (load "auctex.el" nil t t)
-;;; (load "preview-latex.el" nil t t)
-;;; (setq TeX-auto-save t)
-;;; (setq TeX-parse-self t)
-;;; (setq-default TeX-master nil)
-
-;;; Ruby Settings
-;(require 'inf-ruby)
-
-;;; JS Interpreter
-;; (require 'js-comint)
-;; (setq inferior-js-program-command "/usr/local/bin/objj")
-;; (add-hook 'js2-mode-hook '(lambda ()
-;; 			    (local-set-key "\C-x\C-e" 'js-send-last-sexp)
-;; 			    (local-set-key "\C-\M-x" 'js-send-last-sexp-and-go)
-;; 			    (local-set-key "\C-cb" 'js-send-buffer)
-;; 			    (local-set-key "\C-c\C-b" 'js-send-buffer-and-go)
-;; 			    (local-set-key "\C-cl" 'js-load-file-and-go)))
-
-
-(add-path "muse")
-(require 'muse-mode)
-(require 'muse-publish)
-(require 'muse-html)
-(require 'muse-latex)
-(require 'muse-xml)
 
 ;;; Objective-C Settings
 (message "applying Xcode settings ...")
@@ -333,8 +361,7 @@
                 ("\\.j\\'" . objj-mode))
               auto-mode-alist))
 
-(require 'objc-c-mode)
-(require 'objj-mode)
+;(require 'objj-mode)
 
 ;;; Header File Support
 ;;; http://hutley.net/brett/emacs/integrating-emacs-and-xcode/
@@ -538,15 +565,6 @@
      (define-key clojure-mode-map "{" 'paredit-open-brace)
      (define-key clojure-mode-map "}" 'paredit-close-brace)))
 
-;;; Clojure swank
-;;(setq swank-clojure-jar-path "~/Development/Clojure/clojure_1.0.0/clojure.jar")
-
-;;; Clojure classpaths
-;;;(setq swank-clojure-extra-classpaths (list "/path/to/extra/classpaths"))
-
-;; (add-path "swank-clojure")
-;; (require 'swank-clojure-autoload)
-
 ;;; The following function runs Slime with Clojure, even if Slime defaults to another Lisp.
 ;;; The above configuration alone, however, will make Clojure the default, so all that is necessary
 ;;; to run Slime with Clojure is M-x slime.
@@ -556,7 +574,6 @@
   (slime 'clojure))
 
 ;;; Standard ML
-(add-path "sml")
 (autoload 'sml-mode "sml-mode" "Major mode for editing SML." t)
 (autoload 'run-sml "sml-proc" "Run an inferior SML process." t)
 (add-to-list 'auto-mode-alist '("\\.\\(sml\\|sig\\)\\'" . sml-mode))
@@ -576,54 +593,30 @@
 
 ;;; Python Settings
 (message "applying python settings ...")
-(cond ((eq system-type 'gnu/linux)
-       (autoload 'python-mode "python.el"
-         "Major mode for Python replacing old python-mode" t)
-       (require 'pymacs)
-       (pymacs-load "ropemacs" "rope-")))
 
-(require 'django-html-mode)
+(elpy-enable)
+;;(elpy-use-ipython)
 
-;;; Flymake and Python
-(when (load "flymake" t)
-  (defun flymake-pylint-init ()
-    (let* ((temp-file (flymake-init-create-temp-buffer-copy
-                       'flymake-create-temp-inplace))
-           (local-file (file-relative-name
-                        temp-file
-                        (file-name-directory buffer-file-name))))
-      (list "epylint" (list local-file))))
+(when (require 'flycheck nil t)
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (add-hook 'elpy-mode-hook 'flycheck-mode))
 
-  (add-to-list 'flymake-allowed-file-name-masks
-               '("\\.py\\'" flymake-pylint-init)))
+;; (require 'py-autopep8)
+;; (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
 
-;;; Zencoding
-;; (message "applying zencoding settings ...")
-;; (add-path "zencoding")
-;; (require 'zencoding-mode)
-;; ;; Auto-start on any markup modes
-;; (add-hook 'sgml-mode-hook 'zencoding-mode)
+;;; C# Settings
+(message "applying C# settings ...")
 
-;;; Artist Mode
-(autoload 'artist-mode "artist" "Enter artist-mode" t)
-(require 'artist)
+(defun my-csharp-settings-hook ()
+  (setq c-basic-offset 4)
+  (setq-default tab-width 2)
+  (setq-default indent-tabs-mode nil)
+  (electric-pair-local-mode 1))
 
-;;; Java Settings
-;; (message "applying java settings ...")
-;; (add-path "java/jde/lisp")
-;; (add-path "java/elib")
-;; (load-file "emacs.d/java/cedet/common/cedet.el")
-;; (require 'jde)
-
+(add-hook 'csharp-mode-hook 'my-csharp-settings-hook)
 
 ;;; w3m
 (message "applying browser settings ...")
-;; (if (and (= emacs-major-version 23)
-;;          (eq system-type 'gnu/linux))
-;;     (progn
-;;       (add-to-list 'load-path "/usr/share/emacs/site-lisp/w3m")
-;;       (require 'w3m-load))
-;;   (require 'w3m))
 
 (setq browse-url-browser-function 'w3-fetch)
  (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t)
@@ -671,19 +664,6 @@
 (setq css-indent-level 2)
 (smart-tabs-advice js2-indent-line js2-basic-offset)
 
-;;; nXhtml
-(add-path "nxhtml")
-(load (expand-file-name "~/.emacs-cfg/emacs.d/nxhtml/autostart.el"))
-(setq mumamo-chunk-coloring 'no-chunks-colored)
-
-;;; HTML5
-;;; Must add the submodule then run 'make relaxng' to get the schemas
-(add-path "html5")
-(eval-after-load "rng-loc"
-  '(add-to-list 'rng-schema-locating-files "~/.emacs-cfg/emacs.d/html5/schemas.xml"))
-
-;(require 'whattf-dt)
-
 ;;; js2-mode & Ejacs
 (add-path "js2-mode")
 (autoload 'js2-mode "js2-mode" nil t)
@@ -693,17 +673,9 @@
               auto-mode-alist))
 
 ;(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+;(define-key js2-mode-map (kbd "C-c C-r") 'js2-rename-var)
 
-;;; js2 addons
-(add-path "mark-multiple")
-(add-path "js2-refactor")
-;(require 'js2-highlight-vars)
-(require 'js2-refactor)
-
-(define-key js2-mode-map (kbd "C-c C-r") 'js2-rename-var)
-
-;;; JSLint
-(require 'flymake-jslint)
+;;; JSLint(require 'flymake-jslint)
 (add-hook 'js2-mode-hook
 	  (lambda () (flymake-mode 1)))
 
@@ -723,8 +695,6 @@
               auto-mode-alist))
 
 ;;; CoffeeScript
-(add-path "coffee-mode")
-(require 'coffee-mode)
 (add-to-list 'auto-mode-alist '("\\.coffee$" . coffee-mode))
 (add-to-list 'auto-mode-alist '("Cakefile" . coffee-mode))
 
@@ -760,10 +730,6 @@
       (append '(("\\.grm\\'" . bnf-mode))
               auto-mode-alist))
 
-;;; Lua
-;; (require 'flymake-lua)
-;; (add-hook 'lua-mode-hook 'flymake-lua-load)
-
 ;;; Markdown Mode
 (message "applying Markdown settings ...")
 (autoload 'markdown-mode "markdown-mode.el"
@@ -777,10 +743,6 @@
 (setq auto-mode-alist
       (cons '("\\.dot\\'" . graphviz-dot-mode) auto-mode-alist))
 
-;;; APL Mode
-(add-path "gnu-apl-mode")
-(require 'gnu-apl-mode)
-
 ;;; Usually, one wants to use a different font for APL buffers.
 ;;; This mode includes a face called gnu-apl-default which is
 ;;; used in various places, such as the help buffers. However,
@@ -793,35 +755,11 @@
 (add-hook 'gnu-apl-interactive-mode-hook 'em-gnu-apl-init)
 (add-hook 'gnu-apl-mode-hook 'em-gnu-apl-init)
 
-;;; AucTeX
-;;;
-;;; Installed on OS X with
-;;; ./configure --with-emacs=/Applications/Emacs.app/Contents/MacOS/Emacs --with-lispdir=/Applications/Emacs.app/Contents/Resources/site-lisp --with-texmf-dir=/usr/local/texlive/texmf-local
-;;;
-;;; From http://superuser.com/questions/171681/installing-auctex-1-86-over-emacs-app-in-os-x
-;;;
-;; (setenv "PATH" (concat "/usr/texbin:/usr/local/bin:" (getenv "PATH")))
-;; (setq exec-path (append '("/usr/texbin" "/usr/local/bin") exec-path))
-;; (load "auctex.el" nil t t)
-;; (load "preview-latex.el" nil t t)
-
-;;; Gnu Server Settings
-;; (message "applying gnuserv settings ...")
-;; (cond ((eq system-type 'darwin)
-;;        (autoload 'gnuserv-start "gnuserv-compat"
-;;          "Allow this Emacs process to be a server for client processes." t)
-;;        (gnuserv-start))
-;;       ((eq system-type 'gnu/linux)
-;;        (server-start)))
-
-;; ;;; Chrome Edit Server
-;; (if (locate-library "edit-server")
-;;     (progn
-;;       (require 'edit-server)
-;;       (setq edit-server-new-frame nil)
-;;       (edit-server-start)))
-
-;;; Swift
-;(add-to-list 'flycheck-checkers 'swift)
-
-
+;;; Racket / Geiser
+(setq geiser-racket-binary "/Applications/Racket/bin/racket")
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
