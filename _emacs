@@ -60,6 +60,7 @@
     flycheck
     py-autopep8
     realgud
+    graphviz-dot-mode
     ))
 
 (mapc #'(lambda (package)
@@ -738,8 +739,6 @@
       (cons '("README" . markdown-mode) auto-mode-alist))
 
 ;;; Graphviz DOT Language
-(autoload 'graphviz-dot-mode "graphviz-dot-mode.el"
-  "Major mode for editing Graphviz DOT files" t)
 (setq auto-mode-alist
       (cons '("\\.dot\\'" . graphviz-dot-mode) auto-mode-alist))
 
