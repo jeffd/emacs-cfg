@@ -236,17 +236,6 @@
 (cond ((eq system-type 'darwin)
        (global-set-key [(meta return)] 'ns-toggle-fullscreen)))
 
-
-;;; Auto-Complete
-;;; It is easy to install by using a installation script called etc/install.el that is located in the package directory.
-;;;
-;;; Type M-x load-file RET
-;;;
-(message "loading Auto-Complete ...")
-(require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories "~/.emacs-cfg/emacs.d/ac-dict")
-(ac-config-default)
-
 ;;; Git
 (message "applying git settings ...")
 (global-set-key (kbd "C-x g") 'magit-status)
