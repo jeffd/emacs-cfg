@@ -54,6 +54,7 @@
     gnu-apl-mode
     quack
     swift-mode
+    company-sourcekit
     csharp-mode
     coffee-mode
     slime
@@ -100,7 +101,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
+    (company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
@@ -611,7 +612,11 @@
   (setq c-basic-offset 4)
   (setq-default tab-width 2)
   (setq-default indent-tabs-mode nil)
-  (electric-pair-local-mode 1))
+  (electric-pair-local-mode 1)
+  (omnisharp-mode)
+  (company-mode)
+  (flycheck-mode)
+  (yas-minor-mode))
 
 (add-hook 'csharp-mode-hook 'my-csharp-settings-hook)
 
@@ -632,6 +637,13 @@
 (setq cua-auto-tabify-rectangles nil)
 (defadvice align (around smart-tabs activate)
   (let ((indent-tabs-mode nil)) ad-do-it))
+(add-hook 'csharp-mode-hook 'omnisharp-mode)
+
+(setq omnisharp-server-executable-path "~/Development/GitHub/omnisharp-server/OmniSharp/bin/Debug/OmniSharp.exe")
+
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-omnisharp))
+
 (defadvice align-regexp (around smart-tabs activate)
   (let ((indent-tabs-mode nil)) ad-do-it))
 (defadvice indent-relative (around smart-tabs activate)
