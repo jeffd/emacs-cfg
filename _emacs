@@ -46,6 +46,7 @@
     magit
     ein
     elpy
+    ack
     js2-mode
     mark-multiple
     paredit
@@ -62,6 +63,7 @@
     py-autopep8
     realgud
     graphviz-dot-mode
+    omnisharp
     ))
 
 (mapc #'(lambda (package)
@@ -101,7 +103,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
+    (ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
@@ -619,6 +621,10 @@
   (yas-minor-mode))
 
 (add-hook 'csharp-mode-hook 'my-csharp-settings-hook)
+
+(eval-after-load "omnisharp"
+  '(progn
+     (define-key omnisharp-mode-map (kbd "M-.") 'omnisharp-go-to-definition)))
 
 ;;; w3m
 (message "applying browser settings ...")
