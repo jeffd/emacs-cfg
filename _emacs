@@ -48,7 +48,10 @@
     elpy
     ack
     js2-mode
+    go-mode
+    flycheck-gometalinter
     mark-multiple
+    markdown-mode
     paredit
     racket-mode
     sml-mode
@@ -61,9 +64,12 @@
     slime
     flycheck
     py-autopep8
+    yaml-mode
     realgud
     graphviz-dot-mode
     omnisharp
+    sphinx-doc
+    python-docstring
     ))
 
 (mapc #'(lambda (package)
@@ -103,7 +109,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
+    (python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
@@ -607,6 +613,12 @@
 ;; (require 'py-autopep8)
 ;; (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
 
+(add-hook 'python-mode-hook (lambda ()
+                              (require 'sphinx-doc)
+                              (require 'python-docstring)
+                              (python-docstring-mode t)
+                              (sphinx-doc-mode t)))
+
 ;;; C# Settings
 (message "applying C# settings ...")
 
@@ -621,6 +633,34 @@
   (yas-minor-mode))
 
 (add-hook 'csharp-mode-hook 'my-csharp-settings-hook)
+(add-hook 'csharp-mode-hook 'omnisharp-mode)
+
+(setq omnisharp-server-executable-path "~/Development/GitHub/omnisharp-server/OmniSharp/bin/Debug/OmniSharp.exe")
+
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-omnisharp))
+
+
+;; (eval-after-load "flycheck"
+;;   '(progn
+;;      (flycheck-define-checker csharp
+;;        "A C# syntax checker for dotnet. By default, it uses the Mono
+;; compiler. If you would like to use a different compiler, see
+;; `csharp-set-flycheck-command'."
+;;        :command ("gmcs" "-target:module" source)
+;;        :error-patterns
+;;        ;; WinFormsHello.cs(17,9): error CS0246: The type or namespace name `derp' could not be found. Are you missing an assembly reference?
+;;        ((error line-start (file-name) "(" line "," column "): error " (message) line-end)
+;;         (warning line-start (file-name) "(" line "," column "): warning " (message) line-end))
+;;        :modes csharp-mode)
+;;      (add-hook 'flycheck-before-syntax-check-hook  #'csharp-set-flycheck-command)))
+
+;; (flycheck-define-checker csharp-unity
+;;   "Custom checker for Unity projects"
+;;   :modes (csharp-mode)
+;;   :command ("python" (eval "/Users/jdlouhy/Development/normalvr/Normcore/make.py") "fast" (eval "/Users/jdlouhy/Development/normalvr/Normcore/") source-original source)
+;;   :error-patterns((warning line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)
+;;                   (error line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)))
 
 (eval-after-load "omnisharp"
   '(progn
@@ -643,13 +683,6 @@
 (setq cua-auto-tabify-rectangles nil)
 (defadvice align (around smart-tabs activate)
   (let ((indent-tabs-mode nil)) ad-do-it))
-(add-hook 'csharp-mode-hook 'omnisharp-mode)
-
-(setq omnisharp-server-executable-path "~/Development/GitHub/omnisharp-server/OmniSharp/bin/Debug/OmniSharp.exe")
-
-(eval-after-load 'company
-  '(add-to-list 'company-backends 'company-omnisharp))
-
 (defadvice align-regexp (around smart-tabs activate)
   (let ((indent-tabs-mode nil)) ad-do-it))
 (defadvice indent-relative (around smart-tabs activate)
@@ -750,8 +783,6 @@
 
 ;;; Markdown Mode
 (message "applying Markdown settings ...")
-(autoload 'markdown-mode "markdown-mode.el"
-  "Major mode for editing Markdown files" t)
 (setq auto-mode-alist
       (cons '("README" . markdown-mode) auto-mode-alist))
 
