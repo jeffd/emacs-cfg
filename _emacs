@@ -52,6 +52,7 @@
     flycheck-gometalinter
     mark-multiple
     markdown-mode
+    gh-md
     paredit
     racket-mode
     sml-mode
@@ -70,6 +71,7 @@
     omnisharp
     sphinx-doc
     python-docstring
+    graphql-mode
     ))
 
 (mapc #'(lambda (package)
@@ -109,7 +111,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
+    (sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
@@ -785,6 +787,8 @@
 (message "applying Markdown settings ...")
 (setq auto-mode-alist
       (cons '("README" . markdown-mode) auto-mode-alist))
+(add-hook 'markdown-mode-hook
+          (lambda () (visual-line-mode t)))
 
 ;;; Graphviz DOT Language
 (setq auto-mode-alist
