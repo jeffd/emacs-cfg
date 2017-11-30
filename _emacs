@@ -49,6 +49,9 @@
     ack
     js2-mode
     go-mode
+    go-complete
+    go-playground
+    exec-path-from-shell
     flycheck-gometalinter
     mark-multiple
     markdown-mode
@@ -72,6 +75,7 @@
     sphinx-doc
     python-docstring
     graphql-mode
+    dockerfile-mode
     ))
 
 (mapc #'(lambda (package)
@@ -814,3 +818,44 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;;; Golang
+
+;;; For better autocomplete, ,make sure you install:
+;;;   go get -u github.com/nsf/gocode
+;;; For definitions
+;;;   go get github.com/rogpeppe/godef
+
+(defun auto-complete-for-go ()
+  (auto-complete-mode 1))
+
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "GOPATH"))
+
+(defun my-go-mode-hook ()
+  ; Call Gofmt before saving
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  (flycheck-mode)
+  (auto-complete-mode)
+  (auto-complete-for-go)
+  ; Godef jump key binding
+  (local-set-key (kbd "M-.") 'godef-jump)
+  (local-set-key (kbd "M-*") 'pop-tag-mark))
+
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+
+;; You’ll also need the following (as recommended in gocode issue 325 https://github.com/nsf/gocode/issues/325):
+(with-eval-after-load 'go-mode
+  (require 'go-autocomplete))
+
+(defun set-exec-path-from-shell-PATH ()
+  (let ((path-from-shell (replace-regexp-in-string
+                          "[ \t\n]*$"
+                          ""
+                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
+    (setenv "PATH" path-from-shell)
+    (setq eshell-path-env path-from-shell) ; for eshell users
+    (setq exec-path (split-string path-from-shell path-separator))))
+
+(when window-system (set-exec-path-from-shell-PATH))
