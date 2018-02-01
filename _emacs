@@ -825,6 +825,9 @@
 ;;;   go get -u github.com/nsf/gocode
 ;;; For definitions
 ;;;   go get github.com/rogpeppe/godef
+;;;
+;;; Metalinter:
+;;; go get -u gopkg.in/alecthomas/gometalinter.v2
 
 (defun auto-complete-for-go ()
   (auto-complete-mode 1))
@@ -833,17 +836,23 @@
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "GOPATH"))
 
+(eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-gometalinter-setup))
+
 (defun my-go-mode-hook ()
   ; Call Gofmt before saving
   (add-hook 'before-save-hook 'gofmt-before-save)
   (flycheck-mode)
   (auto-complete-mode)
   (auto-complete-for-go)
+  (ac-config-default)
+  (go-eldoc-setup)
   ; Godef jump key binding
   (local-set-key (kbd "M-.") 'godef-jump)
   (local-set-key (kbd "M-*") 'pop-tag-mark))
 
 (add-hook 'go-mode-hook 'my-go-mode-hook)
+
 
 ;; You’ll also need the following (as recommended in gocode issue 325 https://github.com/nsf/gocode/issues/325):
 (with-eval-after-load 'go-mode
