@@ -51,6 +51,7 @@
     go-mode
     go-complete
     go-playground
+    go-eldoc
     exec-path-from-shell
     flycheck-gometalinter
     mark-multiple
