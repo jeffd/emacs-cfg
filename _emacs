@@ -76,7 +76,7 @@
     python-docstring
     graphql-mode
     dockerfile-mode
-    ))
+    protobuf-mode))
 
 (mapc #'(lambda (package)
     (unless (package-installed-p package)
@@ -115,7 +115,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
+    (protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
@@ -178,10 +178,23 @@
 ;;; http://igordevlog.blogspot.com/2007/05/how-to-consolas-font-in-linux.html
 ;;;
 (message "applying font settings ...")
+;; (if (eq system-type 'darwin)
+;;     (set-face-attribute 'default nil
+;; 			:family "consolas" :height 130)
+;;   (set-frame-font "Consolas-13"))
+
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
-			:family "consolas" :height 130)
-  (set-frame-font "Consolas-13"))
+			:family "Operator Mono Medium" :height 130)
+  (set-frame-font "Operator Mono Medium 13"))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(font-lock-keyword-face ((t (:foreground "#859900" :slant italic))))
+ '(font-lock-type-face ((t (:foreground "#b58900" :slant italic)))))
 
 ;;; Settings Theme
 (message "applying theme settings ...")
@@ -812,12 +825,6 @@
 
 ;;; Racket / Geiser
 (setq geiser-racket-binary "/Applications/Racket/bin/racket")
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
 ;;; Golang
 
