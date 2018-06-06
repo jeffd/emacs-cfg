@@ -47,6 +47,7 @@
     ein
     elpy
     ack
+    full-ack
     js2-mode
     go-mode
     go-complete
@@ -77,7 +78,11 @@
     python-docstring
     graphql-mode
     dockerfile-mode
-    protobuf-mode))
+    protobuf-mode
+    go-dlv
+    cmake-mode
+    cmake-ide
+    rtags))
 
 (mapc #'(lambda (package)
     (unless (package-installed-p package)
@@ -116,7 +121,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
+    (full-ack rtags cmake-font-lock cmake-ide cmake-mode go-dlv protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
@@ -452,6 +457,38 @@
          (interactive)
          (shell-command "osascript -e 'tell application \"Xcode\" to build project 1'")
          (shell-command "osascript -e 'tell application \"Xcode\" to launch project 1'"))))
+
+;;; C++ Settings
+; style I want to use in c++ mode
+(c-add-style "cpp-style"
+	     '("stroustrup"
+	       (indent-tabs-mode . nil)        ; use spaces rather than tabs
+	       (c-basic-offset . 4)            ; indent by four spaces
+	       (c-offsets-alist . ((inline-open . 0)  ; custom indentation rules
+				   (brace-list-open . 0)
+				   (statement-case-open . +)))))
+
+(defun my-c++-mode-hook ()
+  (c-set-style "cpp-style")        ; use my-style defined above
+  (auto-fill-mode)
+  (c-toggle-auto-hungry-state 1)
+  (setq flycheck-clang-language-standard "c++11"))
+
+(add-hook 'c++-mode-hook 'my-c++-mode-hook)
+
+;; Turn flycheck on everywhere
+(global-flycheck-mode)
+
+(eval-after-load 'c++-mode
+'(progn
+   (flycheck-mode)))
+
+;(require 'rtags) ;; optional, must have rtags installed
+;; brew install llvm --with-libcxx --with-clang --without-assertions --with-rtti
+;; brew link llvm
+(cmake-ide-setup)
+
+(setq cmake-ide-build-dir "/Users/jdlouhy/Development/normalvr/Realtime/build")
 
 ;;; Scheme Settings
 (message "applying scheme settings ...")
