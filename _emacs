@@ -459,19 +459,47 @@
          (shell-command "osascript -e 'tell application \"Xcode\" to launch project 1'"))))
 
 ;;; C++ Settings
-; style I want to use in c++ mode
-(c-add-style "cpp-style"
-	     '("stroustrup"
-	       (indent-tabs-mode . nil)        ; use spaces rather than tabs
-	       (c-basic-offset . 4)            ; indent by four spaces
-	       (c-offsets-alist . ((inline-open . 0)  ; custom indentation rules
-				   (brace-list-open . 0)
-				   (statement-case-open . +)))))
+
+
+(defconst my-cpp-style
+  '((indent-tabs-mode . nil)
+    (c-basic-offset . 4)
+    (c-subword-mode 1)
+    (tab-width . 4)
+    (c-indent-comments-syntactically-p       . t)
+    (c-comment-only-line-offset              . 0)
+    (c-hanging-braces-alist     . ((substatement-open after)
+                                   (brace-list-open)))
+    (c-hanging-colons-alist     . ((member-init-intro before)
+                                   (inher-intro)
+                                   (case-label after)
+                                   (label after)
+                                   (access-label after)))
+    (c-cleanup-list             . (scope-operator
+                                   empty-defun-braces
+                                   defun-close-semi
+                                   brace-else-brace
+                                   brace-elseif-brace
+                                   compact-empty-funcall))
+    (c-offsets-alist            . ((arglist-close . c-lineup-arglist)
+                                   (substatement-open . -2)
+                                   (case-label        . 2)
+                                   (block-open        . 0)
+                                   (knr-argdecl-intro . -)
+                                   (objc-method-call-cont .
+                                                          (c-lineup-ObjC-method-call-colons
+                                                           c-lineup-ObjC-method-call
+                                                           +))))
+    (c-echo-syntactic-information-p . t))
+  "Jeff's C Programming Style")
+
+(c-add-style "jeff-cpp-style" my-cpp-style)
+
+(setq cmake-ide-build-dir "/Users/jdlouhy/Development/normalvr/Realtime/build")
 
 (defun my-c++-mode-hook ()
-  (c-set-style "cpp-style")        ; use my-style defined above
+  (c-set-style "jeff-cpp-style")
   (auto-fill-mode)
-  (c-toggle-auto-hungry-state 1)
   (setq flycheck-clang-language-standard "c++11"))
 
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
@@ -479,16 +507,16 @@
 ;; Turn flycheck on everywhere
 (global-flycheck-mode)
 
-(eval-after-load 'c++-mode
-'(progn
-   (flycheck-mode)))
+;; (eval-after-load 'c++-mode
+;; '(progn
+;;    (flycheck-mode)))
 
 ;(require 'rtags) ;; optional, must have rtags installed
 ;; brew install llvm --with-libcxx --with-clang --without-assertions --with-rtti
 ;; brew link llvm
 (cmake-ide-setup)
 
-(setq cmake-ide-build-dir "/Users/jdlouhy/Development/normalvr/Realtime/build")
+
 
 ;;; Scheme Settings
 (message "applying scheme settings ...")
