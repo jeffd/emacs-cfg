@@ -53,16 +53,17 @@
     go-complete
     go-playground
     go-eldoc
+    go-guru
     exec-path-from-shell
     flycheck-gometalinter
     mark-multiple
     markdown-mode
     gh-md
     paredit
-    racket-mode
+    ;racket-mode
     sml-mode
     gnu-apl-mode
-    quack
+    ;quack
     swift-mode
     company-sourcekit
     csharp-mode
@@ -217,7 +218,7 @@
           'comint-strip-ctrl-m)
 
 ;;; Full Ack
-(add-path "full-ack")
+;(add-path "full-ack")
 (autoload 'ack-same "full-ack" nil t)
 (autoload 'ack "full-ack" nil t)
 (autoload 'ack-find-same-file "full-ack" nil t)
@@ -894,13 +895,23 @@
 
 ;;; Golang
 
+;;; See: https://johnsogg.github.io/emacs-golang
+
 ;;; For better autocomplete, ,make sure you install:
 ;;;   go get -u github.com/nsf/gocode
 ;;; For definitions
 ;;;   go get github.com/rogpeppe/godef
 ;;;
 ;;; Metalinter:
-;;; go get -u gopkg.in/alecthomas/gometalinter.v2
+;;;   go get -u gopkg.in/alecthomas/gometalinter.v2
+;;;
+;;; Others:
+;;;   go get -u golang.org/x/tools/cmd/...
+;;;   go get -u github.com/rogpeppe/godef/...
+;;;   go get -u github.com/nsf/gocode
+;;;   go get -u golang.org/x/tools/cmd/goimports
+;;;   go get -u golang.org/x/tools/cmd/guru
+;;;   go get -u github.com/dougm/goflymake
 
 (defun auto-complete-for-go ()
   (auto-complete-mode 1))
@@ -912,20 +923,40 @@
 (eval-after-load 'flycheck
   '(add-hook 'flycheck-mode-hook #'flycheck-gometalinter-setup))
 
+;; Snag the user's PATH and GOPATH
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "GOPATH"))
+
+;; Define function to call when go-mode loads
 (defun my-go-mode-hook ()
-  ; Call Gofmt before saving
-  (add-hook 'before-save-hook 'gofmt-before-save)
+  (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
+  (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
+  (if (not (string-match "go" compile-command))   ; set compile command default
+      (set (make-local-variable 'compile-command)
+           "go build -v && go test -v && go vet"))
+
   (flycheck-mode)
   (auto-complete-mode)
   (auto-complete-for-go)
   (ac-config-default)
   (go-eldoc-setup)
-  ; Godef jump key binding
-  (local-set-key (kbd "M-.") 'godef-jump)
-  (local-set-key (kbd "M-*") 'pop-tag-mark))
+
+  ;; guru settings
+  (go-guru-hl-identifier-mode)                    ; highlight identifiers
+
+  ;; Key bindings specific to go-mode
+  (local-set-key (kbd "M-.") 'godef-jump)         ; Go to definition
+  (local-set-key (kbd "M-*") 'pop-tag-mark)       ; Return from whence you came
+  (local-set-key (kbd "M-p") 'compile)            ; Invoke compiler
+  (local-set-key (kbd "M-P") 'recompile)          ; Redo most recent compile cmd
+  (local-set-key (kbd "M-]") 'next-error)         ; Go to next error (or msg)
+  (local-set-key (kbd "M-[") 'previous-error)     ; Go to previous error or msg
+
+  ;; Misc go stuff
+  (auto-complete-mode 1))                         ; Enable auto-complete mode
 
 (add-hook 'go-mode-hook 'my-go-mode-hook)
-
 
 ;; You’ll also need the following (as recommended in gocode issue 325 https://github.com/nsf/gocode/issues/325):
 (with-eval-after-load 'go-mode
