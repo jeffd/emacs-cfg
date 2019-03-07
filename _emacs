@@ -113,6 +113,8 @@
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
 
+(setq tramp-default-method "ssh")
+
 ;;; Custom Vairables
 (message "applying gnuserv settings ...")
 (custom-set-variables
