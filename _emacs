@@ -122,7 +122,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (full-ack rtags cmake-font-lock cmake-ide cmake-mode go-dlv protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
+    (godoctor go-fill-struct go-gen-test go-rename full-ack rtags cmake-font-lock cmake-ide cmake-mode go-dlv protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
