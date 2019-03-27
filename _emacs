@@ -81,6 +81,7 @@
     dockerfile-mode
     protobuf-mode
     go-dlv
+    go-fill-struct
     cmake-mode
     cmake-ide
     rtags))
