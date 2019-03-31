@@ -48,12 +48,18 @@
     elpy
     ack
     full-ack
+    ack-menu
     js2-mode
     go-mode
     go-complete
     go-playground
     go-eldoc
     go-guru
+    godoctor
+    go-rename
+    go-gen-test
+    go-errcheck
+    go-direx
     exec-path-from-shell
     flycheck-gometalinter
     mark-multiple
@@ -61,6 +67,7 @@
     gh-md
     paredit
     ;racket-mode
+    ac-geiser
     sml-mode
     gnu-apl-mode
     ;quack
@@ -84,7 +91,23 @@
     go-fill-struct
     cmake-mode
     cmake-ide
-    rtags))
+    cmake-font-lock
+    cask-mode
+    cask
+    rvm
+    ruby-mode
+    osx-plist
+    markdown-mode+
+    magit-filenotify
+    json-mode
+    inf-ruby
+    git-timemachine
+    flycheck-clojure
+    diff-git
+    css-mode
+    columnify
+    rtags
+    w3))
 
 (mapc #'(lambda (package)
     (unless (package-installed-p package)
