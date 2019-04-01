@@ -96,7 +96,7 @@
     cask
     rvm
     ruby-mode
-    osx-plist
+    ;osx-plist
     markdown-mode+
     magit-filenotify
     json-mode
