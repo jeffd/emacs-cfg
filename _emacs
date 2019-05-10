@@ -42,7 +42,7 @@
   (package-refresh-contents))
 
 (defvar jeffsPackages
-  '(color-theme-solarized
+  '(solarized-theme
     magit
     ein
     elpy
@@ -147,9 +147,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(package-selected-packages
    (quote
-    (flycheck-golangci-lint godoctor go-fill-struct go-gen-test go-rename full-ack rtags cmake-font-lock cmake-ide cmake-mode go-dlv protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify color-theme-solarized ac-geiser)))
+    (flycheck-golangci-lint godoctor go-fill-struct go-gen-test go-rename full-ack rtags cmake-font-lock cmake-ide cmake-mode go-dlv protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
@@ -231,12 +234,9 @@
  '(font-lock-type-face ((t (:foreground "#b58900" :slant italic)))))
 
 ;;; Settings Theme
+(load-theme 'solarized-dark t)
+
 (message "applying theme settings ...")
-(require 'color-theme)
-(setq color-theme-is-global t)
-(color-theme-initialize)
-;(color-theme-comidia)
-(color-theme-solarized-dark)
 
 ;;; Shell Settings
 (message "applying shell settings ...")
@@ -939,6 +939,11 @@
 ;;;   go get -u golang.org/x/tools/cmd/goimports
 ;;;   go get -u golang.org/x/tools/cmd/guru
 ;;;   go get -u github.com/dougm/goflymake
+;;;   go get -u github.com/davidrjenni/reftools/cmd/fillstruct
+;;;   go get -u  github.com/godoctor/godoctor
+;;;
+;;; MetaLinter: https://github.com/golangci/golangci-lint
+;;;   curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.16.0
 
 (defun auto-complete-for-go ()
   (auto-complete-mode 1))
@@ -949,8 +954,6 @@
 
 (setenv "GO111MODULE" "on")
 
-;; MetaLinter: https://github.com/golangci/golangci-lint
-;; curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.16.0
 
 (eval-after-load 'flycheck
   '(add-hook 'flycheck-mode-hook #'flycheck-golangci-lint-setup))
