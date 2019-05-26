@@ -50,6 +50,7 @@
     full-ack
     ack-menu
     js2-mode
+    dap-mode
     go-mode
     go-complete
     go-playground
@@ -928,25 +929,22 @@
 ;;;   go get -u github.com/nsf/gocode
 ;;; For definitions
 ;;;   go get github.com/rogpeppe/godef
-;;;
-;;; Metalinter:
-;;;   go get -u gopkg.in/alecthomas/gometalinter.v2
-;;;
+;;;;;;
 ;;; Others:
 ;;;   go get -u golang.org/x/tools/cmd/...
 ;;;   go get -u github.com/rogpeppe/godef/...
-;;;   go get -u github.com/nsf/gocode
 ;;;   go get -u golang.org/x/tools/cmd/goimports
 ;;;   go get -u golang.org/x/tools/cmd/guru
 ;;;   go get -u github.com/dougm/goflymake
 ;;;   go get -u github.com/davidrjenni/reftools/cmd/fillstruct
-;;;   go get -u  github.com/godoctor/godoctor
+;;;   go get -u github.com/godoctor/godoctor
+;;;   go get -u github.com/stamblerre/gocode
 ;;;
 ;;; MetaLinter: https://github.com/golangci/golangci-lint
 ;;;   curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(go env GOPATH)/bin v1.16.0
 
-(defun auto-complete-for-go ()
-  (auto-complete-mode 1))
+;; (defun auto-complete-for-go ()
+;;   (auto-complete-mode 1))
 
 (when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize)
@@ -954,6 +952,9 @@
 
 (setenv "GO111MODULE" "on")
 
+(setq auto-mode-alist
+      (append '(("\\.mod$" . go-mode))  ; Go modules
+              auto-mode-alist))
 
 (eval-after-load 'flycheck
   '(add-hook 'flycheck-mode-hook #'flycheck-golangci-lint-setup))
@@ -973,7 +974,7 @@
 
   (flycheck-mode)
   (auto-complete-mode)
-  (auto-complete-for-go)
+  ;; (auto-complete-for-go)
   (ac-config-default)
   (go-eldoc-setup)
 
@@ -989,21 +990,16 @@
   (local-set-key (kbd "M-[") 'previous-error)     ; Go to previous error or msg
 
   ;; Misc go stuff
-  (auto-complete-mode 1))                         ; Enable auto-complete mode
+  (auto-complete-mode 1) ; Enable auto-complete mode
+  ;(flycheck-golangci-lint-fast t)
+  )
 
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
-;; You’ll also need the following (as recommended in gocode issue 325 https://github.com/nsf/gocode/issues/325):
-(with-eval-after-load 'go-mode
-  (require 'go-autocomplete))
+;; Debugging
 
-(defun set-exec-path-from-shell-PATH ()
-  (let ((path-from-shell (replace-regexp-in-string
-                          "[ \t\n]*$"
-                          ""
-                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
-    (setenv "PATH" path-from-shell)
-    (setq eshell-path-env path-from-shell) ; for eshell users
-    (setq exec-path (split-string path-from-shell path-separator))))
+;;https://github.com/emacs-lsp/dap-mode#go-1
+(require 'dap-go)
+(dap-go-setup)
 
-(when window-system (set-exec-path-from-shell-PATH))
+
