@@ -924,13 +924,6 @@
 ;;; Golang
 
 ;;; See: https://johnsogg.github.io/emacs-golang
-
-;;; For better autocomplete, ,make sure you install:
-;;;   go get -u github.com/nsf/gocode
-;;; For definitions
-;;;   go get github.com/rogpeppe/godef
-;;;;;;
-;;; Others:
 ;;;   go get -u golang.org/x/tools/cmd/...
 ;;;   go get -u github.com/rogpeppe/godef/...
 ;;;   go get -u golang.org/x/tools/cmd/goimports
@@ -992,7 +985,11 @@
   ;; Misc go stuff
   (auto-complete-mode 1) ; Enable auto-complete mode
   ;(flycheck-golangci-lint-fast t)
-  )
+
+  (make-local-variable 'ac-auto-start)
+  (make-local-variable 'ac-trigger-key)
+  (setq ac-auto-start nil)
+  (setq ac-trigger-key "TAB"))
 
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
