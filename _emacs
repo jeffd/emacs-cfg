@@ -61,6 +61,12 @@
     go-gen-test
     go-errcheck
     go-direx
+    lsp-ui
+    lsp-mode
+    lsp-treemacs
+    lsp-sourcekit
+    company-lsp
+    use-package
     exec-path-from-shell
     flycheck-gometalinter
     mark-multiple
@@ -153,7 +159,7 @@
     ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(package-selected-packages
    (quote
-    (flycheck-golangci-lint godoctor go-fill-struct go-gen-test go-rename full-ack rtags cmake-font-lock cmake-ide cmake-mode go-dlv protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify ac-geiser)))
+    (ansi package-build shut-up epl git commander f dash s dap-mode flycheck-golangci-lint godoctor go-fill-struct go-gen-test go-rename full-ack rtags cmake-font-lock cmake-ide cmake-mode go-dlv protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
@@ -232,7 +238,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(font-lock-keyword-face ((t (:foreground "#859900" :slant italic))))
- '(font-lock-type-face ((t (:foreground "#b58900" :slant italic)))))
+ '(font-lock-type-face ((t (:foreground "#b58900" :slant italic))))
+ ;; Fix for lsp-ui sidebar text to stop from wrapping
+ '(markdown-code-face ((t (:inherit font-lock-type-face)))))
 
 ;;; Settings Theme
 (load-theme 'solarized-dark t)
@@ -957,46 +965,94 @@
   (exec-path-from-shell-initialize)
   (exec-path-from-shell-copy-env "GOPATH"))
 
+(use-package lsp-mode
+  :hook (go-mode . lsp)
+  :commands lsp)
+
+;; optionally
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package company-lsp :commands company-lsp)
+
+(use-package go-mode
+  :ensure t
+  :bind (
+         ;; If you want to switch existing go-mode bindings to use lsp-mode/gopls instead
+         ;; uncomment the following lines
+         ;; ("C-c C-j" . lsp-find-definition)
+         ;; ("C-c C-d" . lsp-describe-thing-at-point)
+         )
+  :hook ((go-mode . gopls-config/set-library-path)
+         (go-mode . lsp-deferred)
+	 (go-mode . flycheck-mode)
+	 ;(go-mode . display-line-numbers-mode)
+   (before-save . lsp-organize-imports)
+   (before-save . gofmt-before-save)))
+
+
+(defun gopls-config/set-library-path ()
+  "Set lsp library directory for go modules"
+  (setq lsp-clients-go-library-directories
+        (list
+         ;; /usr is the default value
+         ;"/workspace/Workspace"
+         ;; add $GOPATH/pkg/mod to the "library path"
+         ;; this causes lsp-mode to try each of the active lsp sessions instead
+         ;; of prompting for which project to use
+         ;; see (lsp--try-open-in-library-workspace)
+         (concat (string-trim-right (shell-command-to-string "go env GOPATH")) "/pkg/mod"))))
+
+(provide 'gopls-config)
+
 ;; Define function to call when go-mode loads
-(defun my-go-mode-hook ()
-  (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
-  (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
-  (if (not (string-match "go" compile-command))   ; set compile command default
-      (set (make-local-variable 'compile-command)
-           "go build -v && go test -v && go vet"))
+;; (defun my-go-mode-hook ()
+;;   (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
+;;   (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
+;;   (if (not (string-match "go" compile-command))   ; set compile command default
+;;       (set (make-local-variable 'compile-command)
+;;            "go build -v && go test -v && go vet"))
 
-  (flycheck-mode)
-  (auto-complete-mode)
-  ;; (auto-complete-for-go)
-  (ac-config-default)
-  (go-eldoc-setup)
+;;   (flycheck-mode)
+;;   (auto-complete-mode)
+;;   ;; (auto-complete-for-go)
+;;   (ac-config-default)
+;;   (go-eldoc-setup)
 
-  ;; guru settings
-  (go-guru-hl-identifier-mode)                    ; highlight identifiers
+;;   ;; Gopls
+;;   ;; https://github.com/golang/go/wiki/gopls
+;;   ;(lsp-mode)
+;;   ;; optional - provides fancier overlays
+;;   ;(lsp-ui)
+;;   ;; if you use company-mode for completion (otherwise, complete-at-point works out of the box):
+;;   ;(company-lsp)
 
-  ;; Key bindings specific to go-mode
-  (local-set-key (kbd "M-.") 'godef-jump)         ; Go to definition
-  (local-set-key (kbd "M-*") 'pop-tag-mark)       ; Return from whence you came
-  (local-set-key (kbd "M-p") 'compile)            ; Invoke compiler
-  (local-set-key (kbd "M-P") 'recompile)          ; Redo most recent compile cmd
-  (local-set-key (kbd "M-]") 'next-error)         ; Go to next error (or msg)
-  (local-set-key (kbd "M-[") 'previous-error)     ; Go to previous error or msg
 
-  ;; Misc go stuff
-  (auto-complete-mode 1) ; Enable auto-complete mode
-  ;(flycheck-golangci-lint-fast t)
+;;   ;; guru settings
+;;   (go-guru-hl-identifier-mode)                    ; highlight identifiers
 
-  (make-local-variable 'ac-auto-start)
-  (make-local-variable 'ac-trigger-key)
-  (setq ac-auto-start nil)
-  (setq ac-trigger-key "TAB"))
+;;   ;; Key bindings specific to go-mode
+;;   (local-set-key (kbd "M-.") 'godef-jump)         ; Go to definition
+;;   (local-set-key (kbd "M-*") 'pop-tag-mark)       ; Return from whence you came
+;;   (local-set-key (kbd "M-p") 'compile)            ; Invoke compiler
+;;   (local-set-key (kbd "M-P") 'recompile)          ; Redo most recent compile cmd
+;;   (local-set-key (kbd "M-]") 'next-error)         ; Go to next error (or msg)
+;;   (local-set-key (kbd "M-[") 'previous-error)     ; Go to previous error or msg
 
-(add-hook 'go-mode-hook 'my-go-mode-hook)
+;;   ;; Misc go stuff
+;;   (auto-complete-mode 1) ; Enable auto-complete mode
+;;   ;(flycheck-golangci-lint-fast t)
+
+;;   (make-local-variable 'ac-auto-start)
+;;   (make-local-variable 'ac-trigger-key)
+;;   (setq ac-auto-start nil)
+;;   (setq ac-trigger-key "TAB"))
+
+;; (add-hook 'go-mode-hook 'my-go-mode-hook)
 
 ;; Debugging
 
 ;;https://github.com/emacs-lsp/dap-mode#go-1
 (require 'dap-go)
 (dap-go-setup)
+
 
 
