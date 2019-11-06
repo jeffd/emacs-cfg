@@ -103,10 +103,15 @@
     cask
     rvm
     ruby-mode
+    php-mode
     ;osx-plist
     markdown-mode+
     magit-filenotify
     json-mode
+    web-mode
+    xref-js2
+    js2-refactor
+    tide
     inf-ruby
     git-timemachine
     flycheck-clojure
@@ -239,7 +244,6 @@
  ;; If there is more than one, they won't work right.
  '(font-lock-keyword-face ((t (:foreground "#859900" :slant italic))))
  '(font-lock-type-face ((t (:foreground "#b58900" :slant italic))))
- ;; Fix for lsp-ui sidebar text to stop from wrapping
  '(markdown-code-face ((t (:inherit font-lock-type-face)))))
 
 ;;; Settings Theme
@@ -837,27 +841,73 @@
 (setq css-indent-level 2)
 (smart-tabs-advice js2-indent-line js2-basic-offset)
 
-;;; js2-mode & Ejacs
-(add-path "js2-mode")
-(autoload 'js2-mode "js2-mode" nil t)
-;(autoload 'js-console "js-console" nil t)
-(setq auto-mode-alist
-      (append '(("\\.js$" . js2-mode))
-              auto-mode-alist))
-
-;(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-;(define-key js2-mode-map (kbd "C-c C-r") 'js2-rename-var)
-
-;;; JSLint(require 'flymake-jslint)
-(add-hook 'js2-mode-hook
-	  (lambda () (flymake-mode 1)))
 
 ;;; Javascript
-(require 'json)
-(add-hook 'js2-mode-hook
-   '(lambda ()
-   (setq js2-basic-offset 2)
-   (setq js2-use-font-lock-faces t)))
+
+
+;;; js2-mode & Ejacs
+
+;;;(define-key js2-mode-map (kbd "C-c C-r") 'js2-rename-var)
+
+;; From: https://emacs.cafe/emacs/javascript/setup/2017/04/23/emacs-setup-javascript.html
+;; One minor tweak that I really couldn’t live without is binding js2r-kill to C-k in JS buffers:
+;; This command is very similar to killing in paredit: It kills up to the end of the line, but always keeping the AST valid.
+
+;; (define-key js2-mode-map (kbd "C-k") #'js2r-kill)
+
+;;; Linter
+;;; javascript-eslint
+
+;;; json-mode --- Major mode for editing JSON files with emacs
+;;; https://github.com/joshwnj/json-mode
+(use-package json-mode
+  :ensure t
+  :defer t)
+
+;;; js2-mode --- Improved JavaScript editing mode
+;;; https://github.com/mooz/js2-mode
+(use-package js2-mode
+  :ensure t
+  :mode "\\.js\\'"
+  :bind (("C-k" . js2r-kill)
+         ("M-." . nil))
+  :config
+  (add-hook 'js2-mode-hook 'js2-imenu-extras-mode)
+  (add-hook 'js2-mode-hook 'flycheck-mode)
+  (add-hook 'js2-mode-hook (lambda () (electric-indent-local-mode -1)))
+  (add-hook 'js2-mode-hook (lambda () (electric-layout-mode -1)))
+  (setq-default js-indent-level 2)
+  (setq-default js-auto-indent-flag nil)
+  (setq-default js2-mode-show-parse-errors nil)
+  (setq-default js2-mode-show-strict-warnings nil)
+  (setq-default js2-strict-missing-semi-warning nil)
+  (setq-default js2-autoinsert-semi-and-warn nil))
+
+
+;;; xref-js2 --- Jump to references/definitions using ag & js2-mode's AST in Emacs
+;;; https://github.com/nicolaspetton/xref-js2
+(use-package xref-js2
+  :ensure t
+  :defer t
+  :config
+  (add-hook 'js2-mode-hook (lambda ()
+                             (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))
+
+;;; js2-refactor --- A JavaScript refactoring library for emacs
+;;; https://github.com/magnars/js2-refactor.el
+(use-package js2-refactor
+  :ensure t
+  :init
+  (add-hook 'js2-mode-hook 'js2-refactor-mode)
+  :bind (:map js2-mode-map
+              ("C-k" . js2r-kill)))
+
+(use-package tide
+  :ensure t
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save)))
 
 ;;; Roku BrightScript
 ;;; https://bitbucket.org/markroddy/brightscript-mode/overview
