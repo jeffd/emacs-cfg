@@ -48,6 +48,7 @@
     elpy
     ack
     full-ack
+    ag
     ack-menu
     js2-mode
     dap-mode
@@ -112,6 +113,7 @@
     xref-js2
     js2-refactor
     tide
+    prettier-js
     inf-ruby
     git-timemachine
     flycheck-clojure
@@ -234,8 +236,8 @@
 
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
-			:family "Operator Mono Medium" :height 130)
-  (set-frame-font "Operator Mono Medium 13"))
+			:family "Operator Mono Medium" :height 140)
+  (set-frame-font "Operator Mono Medium 14"))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -268,6 +270,11 @@
 (eval-after-load "shell"
   '(progn
      (define-key shell-mode-map (kbd "C-x p") 'find-file-at-point)))
+
+;;; ag (ack replacement)
+(use-package ag
+  :ensure t
+  :init (setq ag-reuse-window 't))
 
 ;;; Smooth Scrolling
 (message "applying scrolling settings ...")
@@ -869,8 +876,8 @@
 (use-package js2-mode
   :ensure t
   :mode "\\.js\\'"
-  :bind (("C-k" . js2r-kill)
-         ("M-." . nil))
+  ;; :bind (("C-k" . js2r-kill)
+  ;;        ("M-." . nil))
   :config
   (add-hook 'js2-mode-hook 'js2-imenu-extras-mode)
   (add-hook 'js2-mode-hook 'flycheck-mode)
@@ -883,6 +890,13 @@
   (setq-default js2-strict-missing-semi-warning nil)
   (setq-default js2-autoinsert-semi-and-warn nil))
 
+(use-package typescript-mode
+  :ensure t
+  :mode (("\\.ts\\'" . typescript-mode)
+         ("\\.tsx\\'" . typescript-mode))
+  :init (setq indent-level 2
+              tab-width 2
+              indent-tabs-mode t))
 
 ;;; xref-js2 --- Jump to references/definitions using ag & js2-mode's AST in Emacs
 ;;; https://github.com/nicolaspetton/xref-js2
@@ -899,8 +913,8 @@
   :ensure t
   :init
   (add-hook 'js2-mode-hook 'js2-refactor-mode)
-  :bind (:map js2-mode-map
-              ("C-k" . js2r-kill)))
+;  :bind (:map js2-mode-map ("C-k" . js2r-kill))
+  )
 
 (use-package tide
   :ensure t
@@ -908,6 +922,48 @@
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
          (before-save . tide-format-before-save)))
+
+(use-package prettier-js
+  :ensure t
+  :hook ((js2-mode . prettier-js-mode)
+         (web-mode . prettier-js-mode)
+         (tide-mode . prettier-js-mode))
+  :config (setq prettier-js-args '("--config" "/Users/jdlouhy/Development/notion/notion-next/.prettierrc"
+                                   "--ignore-path" "/Users/jdlouhy/Development/notion/notion-next/.prettierignore")))
+
+(use-package web-mode
+  :ensure t
+  :init (setq web-mode-enable-auto-quoting nil
+              web-mode-enable-comment-annotation t
+              web-mode-enable-current-element-highlight t
+              web-mode-code-indent-offset 2
+              web-mode-css-indent-offset 2
+              web-mode-markup-indent-offset 2
+              web-mode-attr-indent-offset nil)
+  :mode (("\\.html?\\'" . web-mode)
+         ("\\.php\\'"   . web-mode)
+         ("\\.tpl\\'"   . web-mode)))
+
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
+(use-package tide
+  :after (web-mode company flycheck)
+  :hook ((web-mode . (lambda ()
+                       (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                         (setup-tide-mode)
+                         (flycheck-add-mode 'javascript-eslint 'web-mode)))))
+  :config
+  (flycheck-add-next-checker 'typescript-tide 'javascript-eslint)
+  (flycheck-add-next-checker 'tsx-tide 'javascript-eslint))
+
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
 
 ;;; Roku BrightScript
 ;;; https://bitbucket.org/markroddy/brightscript-mode/overview
