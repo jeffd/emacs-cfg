@@ -875,6 +875,7 @@
 ;;; https://github.com/mooz/js2-mode
 (use-package js2-mode
   :ensure t
+  :defer t
   :mode "\\.js\\'"
   ;; :bind (("C-k" . js2r-kill)
   ;;        ("M-." . nil))
@@ -892,6 +893,7 @@
 
 (use-package typescript-mode
   :ensure t
+  :defer t
   :mode (("\\.ts\\'" . typescript-mode)
          ("\\.tsx\\'" . typescript-mode))
   :init (setq indent-level 2
@@ -911,20 +913,15 @@
 ;;; https://github.com/magnars/js2-refactor.el
 (use-package js2-refactor
   :ensure t
+  :defer t
   :init
   (add-hook 'js2-mode-hook 'js2-refactor-mode)
-;  :bind (:map js2-mode-map ("C-k" . js2r-kill))
+  :bind (:map js2-mode-map ("C-k" . js2r-kill))
   )
-
-(use-package tide
-  :ensure t
-  :after (typescript-mode company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save)))
 
 (use-package prettier-js
   :ensure t
+  :defer t
   :hook ((js2-mode . prettier-js-mode)
          (web-mode . prettier-js-mode)
          (tide-mode . prettier-js-mode))
@@ -933,6 +930,7 @@
 
 (use-package web-mode
   :ensure t
+  :defer t
   :init (setq web-mode-enable-auto-quoting nil
               web-mode-enable-comment-annotation t
               web-mode-enable-current-element-highlight t
@@ -944,26 +942,39 @@
          ("\\.php\\'"   . web-mode)
          ("\\.tpl\\'"   . web-mode)))
 
-(defun setup-tide-mode ()
-  (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  (company-mode +1))
+;; (defun setup-tide-mode ()
+;;   (interactive)
+;;   (tide-setup)
+;;   (flycheck-mode +1)
+;;   (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
+;;   (eldoc-mode +1)
+;;   (tide-hl-identifier-mode +1)
+;;   (company-mode +1))
+
+;; (add-hook 'typescript-mode-hook #'setup-tide-mode)
+;; (use-package tide
+;;   :after (web-mode company flycheck)
+;;   :hook ((web-mode . (lambda ()
+;;                        (when (string-equal "tsx" (file-name-extension buffer-file-name))
+;;                          (setup-tide-mode)
+;;                          (flycheck-add-mode 'javascript-eslint 'web-mode)))))
+;;   :config
+;;   (flycheck-add-next-checker 'typescript-tide 'javascript-eslint)
+;;   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint))
+
+
 
 (use-package tide
-  :after (web-mode company flycheck)
-  :hook ((web-mode . (lambda ()
-                       (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                         (setup-tide-mode)
-                         (flycheck-add-mode 'javascript-eslint 'web-mode)))))
+  :ensure t
+  :defer t
+  :after (typescript-mode company flycheck)
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save))
   :config
   (flycheck-add-next-checker 'typescript-tide 'javascript-eslint)
   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint))
 
-(add-hook 'typescript-mode-hook #'setup-tide-mode)
 
 ;;; Roku BrightScript
 ;;; https://bitbucket.org/markroddy/brightscript-mode/overview
