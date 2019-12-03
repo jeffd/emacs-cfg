@@ -8,7 +8,7 @@
 
 (message "started loading settings ...")
 
-(setq custom-basedir (expand-file-name "~/.emacs-cfg/emacs.d/"))
+(defvar custom-basedir (expand-file-name "~/.emacs-cfg/emacs.d/"))
 (add-to-list 'load-path custom-basedir)
 (add-to-list 'exec-path "~/.emacs-cfg/emacs.d")
 (add-to-list 'exec-path "/Applications/Racket/bin")
@@ -20,6 +20,7 @@
 (add-to-list 'exec-path "/Applications/Graphviz.app/Contents/MacOS/")
 
 (defun add-path (p)
+  "Adds a path to the load-path."
   (add-to-list 'load-path (concat custom-basedir p)))
 
 ;;; Emacs Lisp Package Archive
@@ -73,6 +74,7 @@
     mark-multiple
     markdown-mode
     gh-md
+    smart-compile
     paredit
     ;racket-mode
     ac-geiser
@@ -113,6 +115,7 @@
     xref-js2
     js2-refactor
     tide
+    add-node-modules-path
     prettier-js
     inf-ruby
     git-timemachine
@@ -130,14 +133,14 @@
       jeffsPackages)
 
 ;;; Will remove when there is a true GNU Operating System
-(setq inhibit-start-screen 1)
-(setq inhibit-splash-screen 1)
+(setq-default inhibit-start-screen 1)
+(setq-default inhibit-splash-screen 1)
 
-(setq visible-bell (eq system-type 'gnu/linux))
+(setq-default visible-bell (eq system-type 'gnu/linux))
 
 ;;; Mac keyboard on Linux
-(setq mac-command-key-is-meta t)
-(setq mac-command-modifier 'meta)
+(setq-default mac-command-key-is-meta t)
+(setq-default mac-command-modifier 'meta)
 
 ;;; Mouse clicks on macOS
 ;;; Via: https://joelkuiper.eu/spellcheck_emacs
@@ -152,7 +155,7 @@
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
 
-(setq tramp-default-method "ssh")
+(setq-default tramp-default-method "ssh")
 
 ;;; Custom Vairables
 (message "applying gnuserv settings ...")
@@ -166,7 +169,7 @@
     ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(package-selected-packages
    (quote
-    (ansi package-build shut-up epl git commander f dash s dap-mode flycheck-golangci-lint godoctor go-fill-struct go-gen-test go-rename full-ack rtags cmake-font-lock cmake-ide cmake-mode go-dlv protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify ac-geiser)))
+    (smart-compile helpful ansi package-build shut-up epl git commander f dash s dap-mode flycheck-golangci-lint godoctor go-fill-struct go-gen-test go-rename full-ack rtags cmake-font-lock cmake-ide cmake-mode go-dlv protobuf-mode dockerfile-mode go-complete go-playground sicp graphql-mode python-docstring sphinx-doc markdown-mode markdown-mode+ flycheck-gometalinter go-mode ack-menu ack company-sourcekit omnisharp realgud csharp-mode w3 tex-math-preview slime-repl rvm ruby-mode osx-plist magit-filenotify json-mode inf-ruby go-errcheck go-eldoc go-direx go-autocomplete git-timemachine gist flycheck-clojure diff-git css-mode columnify ac-geiser)))
  '(scheme48-keywords
    (quote
     ((dynamic-wind 0 nil)
@@ -229,11 +232,6 @@
 ;;; http://igordevlog.blogspot.com/2007/05/how-to-consolas-font-in-linux.html
 ;;;
 (message "applying font settings ...")
-;; (if (eq system-type 'darwin)
-;;     (set-face-attribute 'default nil
-;; 			:family "consolas" :height 130)
-;;   (set-frame-font "Consolas-13"))
-
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil
 			:family "Operator Mono Medium" :height 140)
@@ -259,13 +257,6 @@
 (add-hook 'comint-output-filter-functions
           'comint-strip-ctrl-m)
 
-;;; Full Ack
-;(add-path "full-ack")
-(autoload 'ack-same "full-ack" nil t)
-(autoload 'ack "full-ack" nil t)
-(autoload 'ack-find-same-file "full-ack" nil t)
-(autoload 'ack-find-file "full-ack" nil t)
-
 ;;; Ack Shell Trick
 (eval-after-load "shell"
   '(progn
@@ -286,14 +277,15 @@
 ;;; brew install aspell --lang=en
 ;;;
 (message "applying scrolling settings ...")
-(setq ispell-program-name "aspell"
-  ispell-extra-args '("--sug-mode=ultra"))
+(setq-default ispell-program-name "aspell"
+              ispell-extra-args '("--sug-mode=ultra"))
 
 (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 ;;; Compile Settings
-(require 'smart-compile)
+(use-package smart-compile
+  :ensure t)
 
 ;;; C-x b
 ;(require 'iswitchb) ; Apparenly Obsolete now
@@ -332,17 +324,12 @@
 (message "applying git settings ...")
 (global-set-key (kbd "C-x g") 'magit-status)
 
-;;; Mercurial
-(message "loading Mercurial settings ...")
-(add-path "ahg")
-(require 'ahg)
-
 ;;; Cursor and Line
 (message "applying cursor settings ...")
 (setq-default cursor-type 'box)
 (setq-default show-trailing-whitespace t)
 (setq-default transient-mark-mode t)
-(setq default-truncate-lines t)
+(setq-default default-truncate-lines t)
 ;;;(cua-mode t)
 
 ;;; Scrolling
@@ -352,7 +339,7 @@
 ;;; C Style Settings
 (message "applying c style settings ...")
 (setq-default indent-tabs-mode nil)
-(setq tab-width 2)
+(setq-default tab-width 2)
 
 (add-hook 'swift-mode-hook
           (lambda ()
@@ -360,8 +347,8 @@
             (defvar swift-indent-offset)
             (setq-local swift-indent-offset 2)))
 
-(setq swift-indent-offset 2)
-(setq swift-indent-hanging-comma-offset 2)
+(setq-default swift-indent-offset 2)
+(setq-default swift-indent-hanging-comma-offset 2)
 
 ;;; Create my personal style.
 (defconst my-c-style
@@ -507,8 +494,6 @@
          (shell-command "osascript -e 'tell application \"Xcode\" to launch project 1'"))))
 
 ;;; C++ Settings
-
-
 (defconst my-cpp-style
   '((indent-tabs-mode . nil)
     (c-basic-offset . 4)
@@ -539,11 +524,12 @@
                                                            c-lineup-ObjC-method-call
                                                            +))))
     (c-echo-syntactic-information-p . t))
-  "Jeff's C Programming Style")
+  "Jeff's C++ Programming Style")
 
 (c-add-style "jeff-cpp-style" my-cpp-style)
 
-(setq cmake-ide-build-dir "/Users/jdlouhy/Development/normalvr/Realtime/build")
+;;; Normal VR Related Settings
+(setq-default cmake-ide-build-dir "/Users/jdlouhy/Development/normalvr/Realtime/build")
 
 (defun my-c++-mode-hook ()
   (c-set-style "jeff-cpp-style")
@@ -563,8 +549,6 @@
 ;; brew install llvm --with-libcxx --with-clang --without-assertions --with-rtti
 ;; brew link llvm
 (cmake-ide-setup)
-
-
 
 ;;; Scheme Settings
 (message "applying scheme settings ...")
@@ -614,7 +598,7 @@
 ;; (add-hook 'hack-local-variables-hook 'maybe-scheme48-mode)
 
 (add-to-list 'interpreter-mode-alist '("scsh" . scheme48-mode))
-(setq scheme-program-name "scsh")
+(setq-default scheme-program-name "scsh")
 (if window-system (show-paren-mode +1))
 
 (setq auto-mode-alist
@@ -736,15 +720,12 @@
 ;;; Python Settings
 (message "applying python settings ...")
 
-(elpy-enable)
-;;(elpy-use-ipython)
-
-(when (require 'flycheck nil t)
-  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-  (add-hook 'elpy-mode-hook 'flycheck-mode))
-
-;; (require 'py-autopep8)
-;; (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
+(use-package elpy
+  :ensure t
+  :defer t
+  :init (elpy-enable)
+  :config (add-hook 'elpy-mode-hook 'flycheck-mode)
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules)))
 
 (add-hook 'python-mode-hook (lambda ()
                               (require 'sphinx-doc)
@@ -757,8 +738,8 @@
 
 (defun my-csharp-settings-hook ()
   (setq c-basic-offset 4)
-  (setq-default tab-width 2)
-  (setq-default indent-tabs-mode nil)
+  (setq tab-width 2)
+  (setq indent-tabs-mode nil)
   (electric-pair-local-mode 1)
   (omnisharp-mode)
   (company-mode)
@@ -773,27 +754,6 @@
 (eval-after-load 'company
   '(add-to-list 'company-backends 'company-omnisharp))
 
-
-;; (eval-after-load "flycheck"
-;;   '(progn
-;;      (flycheck-define-checker csharp
-;;        "A C# syntax checker for dotnet. By default, it uses the Mono
-;; compiler. If you would like to use a different compiler, see
-;; `csharp-set-flycheck-command'."
-;;        :command ("gmcs" "-target:module" source)
-;;        :error-patterns
-;;        ;; WinFormsHello.cs(17,9): error CS0246: The type or namespace name `derp' could not be found. Are you missing an assembly reference?
-;;        ((error line-start (file-name) "(" line "," column "): error " (message) line-end)
-;;         (warning line-start (file-name) "(" line "," column "): warning " (message) line-end))
-;;        :modes csharp-mode)
-;;      (add-hook 'flycheck-before-syntax-check-hook  #'csharp-set-flycheck-command)))
-
-;; (flycheck-define-checker csharp-unity
-;;   "Custom checker for Unity projects"
-;;   :modes (csharp-mode)
-;;   :command ("python" (eval "/Users/jdlouhy/Development/normalvr/Normcore/make.py") "fast" (eval "/Users/jdlouhy/Development/normalvr/Normcore/") source-original source)
-;;   :error-patterns((warning line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)
-;;                   (error line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)))
 
 (eval-after-load "omnisharp"
   '(progn
@@ -844,13 +804,44 @@
        ad-do-it))))
 
 ;;; Web Development
-(setq css-indent-offset 2)
-(setq css-indent-level 2)
-(smart-tabs-advice js2-indent-line js2-basic-offset)
 
+(use-package css-mode
+  :defer t
+  :config
+  (setq css-indent-offset 2)
+  (setq css-indent-level 2)
+  (smart-tabs-advice js2-indent-line js2-basic-offset))
+
+(use-package web-mode
+  :ensure t
+  :mode (("\\.jsx\\'" . web-mode)
+         ("\\.tsx\\'" . web-mode)
+         ("\\.html?\\'" . web-mode)
+         ("\\.php\\'"   . web-mode)
+         ("\\.tpl\\'"   . web-mode))
+  :init (add-hook
+         'web-mode-hook
+         #'(lambda ()
+             (when (string-equal "jsx" (file-name-extension buffer-file-name))
+               (make-local-variable 'indent-tabs-mode)
+               (flycheck-add-mode 'javascript-eslint 'web-mode)
+               (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
+               (setq indent-tabs-mode t
+                     tab-width 2
+                     typescript-indent-level 2))
+             (when (string-equal "tsx" (file-name-extension buffer-file-name))
+               (flycheck-add-mode 'typescript-tslint 'web-mode))
+             (when (and (string-equal "html" (file-name-extension buffer-file-name))
+                        (buffer-contains-substring "{%"))
+               (web-mode-set-engine "django"))))
+  :config
+  (setq web-mode-enable-current-element-highlight t)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-attr-indent-offset nil))
 
 ;;; Javascript
-
 
 ;;; js2-mode & Ejacs
 
@@ -873,32 +864,12 @@
 
 ;;; js2-mode --- Improved JavaScript editing mode
 ;;; https://github.com/mooz/js2-mode
-(use-package js2-mode
-  :ensure t
-  :defer t
-  :mode "\\.js\\'"
-  ;; :bind (("C-k" . js2r-kill)
-  ;;        ("M-." . nil))
-  :config
-  (add-hook 'js2-mode-hook 'js2-imenu-extras-mode)
-  (add-hook 'js2-mode-hook 'flycheck-mode)
-  (add-hook 'js2-mode-hook (lambda () (electric-indent-local-mode -1)))
-  (add-hook 'js2-mode-hook (lambda () (electric-layout-mode -1)))
-  (setq-default js-indent-level 2)
-  (setq-default js-auto-indent-flag nil)
-  (setq-default js2-mode-show-parse-errors nil)
-  (setq-default js2-mode-show-strict-warnings nil)
-  (setq-default js2-strict-missing-semi-warning nil)
-  (setq-default js2-autoinsert-semi-and-warn nil))
 
-(use-package typescript-mode
-  :ensure t
-  :defer t
-  :mode (("\\.ts\\'" . typescript-mode)
-         ("\\.tsx\\'" . typescript-mode))
-  :init (setq indent-level 2
-              tab-width 2
-              indent-tabs-mode t))
+(use-package js2-mode
+  :mode "\\.js\\'"
+  :requires (flycheck)
+  :config
+  (setq js2-basic-offset 2))
 
 ;;; xref-js2 --- Jump to references/definitions using ag & js2-mode's AST in Emacs
 ;;; https://github.com/nicolaspetton/xref-js2
@@ -914,66 +885,64 @@
 (use-package js2-refactor
   :ensure t
   :defer t
-  :init
-  (add-hook 'js2-mode-hook 'js2-refactor-mode)
-  :bind (:map js2-mode-map ("C-k" . js2r-kill))
-  )
+  :hook ((js2-mode . js2-refactor-mode)
+         (web-mode . js2-refactor-mode)
+         (typescript-mode . js2-refactor-mode))
+  :bind (:map js2-mode-map ("C-k" . js2r-kill)))
 
-(use-package prettier-js
+(use-package typescript-mode
   :ensure t
-  :defer t
-  :hook ((js2-mode . prettier-js-mode)
-         (web-mode . prettier-js-mode)
-         (tide-mode . prettier-js-mode))
-  :config (setq prettier-js-args '("--config" "/Users/jdlouhy/Development/notion/notion-next/.prettierrc"
-                                   "--ignore-path" "/Users/jdlouhy/Development/notion/notion-next/.prettierignore")))
+  :mode (("\\.ts\\'" . typescript-mode))
+  :config (add-hook 'typescript-mode-hook
+                    (lambda ()
+                        (make-local-variable 'indent-tabs-mode)
+                        (company-mode)
+                        (setq indent-tabs-mode t
+                              tab-width 2
+                              typescript-indent-level 2))))
 
-(use-package web-mode
-  :ensure t
-  :defer t
-  :init (setq web-mode-enable-auto-quoting nil
-              web-mode-enable-comment-annotation t
-              web-mode-enable-current-element-highlight t
-              web-mode-code-indent-offset 2
-              web-mode-css-indent-offset 2
-              web-mode-markup-indent-offset 2
-              web-mode-attr-indent-offset nil)
-  :mode (("\\.html?\\'" . web-mode)
-         ("\\.php\\'"   . web-mode)
-         ("\\.tpl\\'"   . web-mode)))
-
-;; (defun setup-tide-mode ()
-;;   (interactive)
-;;   (tide-setup)
-;;   (flycheck-mode +1)
-;;   (setq flycheck-check-syntax-automatically '(save mode-enabled idle-change))
-;;   (eldoc-mode +1)
-;;   (tide-hl-identifier-mode +1)
-;;   (company-mode +1))
-
-;; (add-hook 'typescript-mode-hook #'setup-tide-mode)
-;; (use-package tide
-;;   :after (web-mode company flycheck)
-;;   :hook ((web-mode . (lambda ()
-;;                        (when (string-equal "tsx" (file-name-extension buffer-file-name))
-;;                          (setup-tide-mode)
-;;                          (flycheck-add-mode 'javascript-eslint 'web-mode)))))
-;;   :config
-;;   (flycheck-add-next-checker 'typescript-tide 'javascript-eslint)
-;;   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint))
-
-
+(defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode 1)
+    (eldoc-mode 1)
+    (company-mode 1)
+    (tide-hl-identifier-mode 1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    ;(add-hook 'before-save-hook 'tide-format-before-save)
+    (setq typescript-indent-level 2)
+    (setq tide-format-options '(:indentSize 2 :tabSize 2 :convertTabsToSpaces f)))
 
 (use-package tide
   :ensure t
   :defer t
-  :after (typescript-mode company flycheck)
-  :hook ((typescript-mode . tide-setup)
-         (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save))
-  :config
-  (flycheck-add-next-checker 'typescript-tide 'javascript-eslint)
-  (flycheck-add-next-checker 'tsx-tide 'javascript-eslint))
+  :after (:or js2-mode typescript-mode web-mode)
+  ;:requires (:all flycheck company eldoc)
+  :hook ((typescript-mode . setup-tide-mode)
+         (js2-mode . setup-tide-mode)
+         (web-mode . setup-tide-mode)))
+
+(use-package prettier-js
+  :after (:or js2-mode typescript-mode web-mode)
+  :ensure t
+  :defer t
+  :hook ((js2-mode . prettier-js-mode)
+         (web-mode . prettier-js-mode)
+         (tide-mode . prettier-js-mode)
+         (typescript-mode . prettier-js-mode))
+  :config (setq prettier-js-args '("--config" "/Users/jdlouhy/Development/notion/notion-next/.prettierrc"
+                                   "--ignore-path" "/Users/jdlouhy/Development/notion/notion-next/.prettierignore")))
+
+;;; This mode provides add-node-modules-path, which searches the current files parent directories
+;;; for the node_modules/.bin/ directory and adds it to the buffer local exec-path. This allows
+;;; Emacs to find project based installs of e.g. eslint.
+;;; https://github.com/codesuki/add-node-modules-path
+(use-package add-node-modules-path
+  :ensure t
+  :defer t
+  :hook ((typescript-mode . add-node-modules-path)
+         (js-mode . add-node-modules-path)
+         (web-mode . add-node-modules-path)))
 
 
 ;;; Roku BrightScript
@@ -1171,5 +1140,4 @@
 (require 'dap-go)
 (dap-go-setup)
 
-
-
+(message "Finished loading .emacs file ...")
