@@ -45,6 +45,7 @@
 (defvar jeffsPackages
   '(solarized-theme
     magit
+    forge
     ein
     elpy
     ack
@@ -323,6 +324,10 @@
 ;;; Git
 (message "applying git settings ...")
 (global-set-key (kbd "C-x g") 'magit-status)
+
+;;; https://magit.vc/manual/forge/
+(use-package forge
+  :after magit)
 
 ;;; Cursor and Line
 (message "applying cursor settings ...")
